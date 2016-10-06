@@ -4,7 +4,7 @@ class WordLengthsController < ApplicationController
   # GET /word_lengths
   # GET /word_lengths.json
   def index
-    @word_lengths = WordLength.all
+    @word_lengths = WordLength.order(:length).all
   end
 
   # GET /word_lengths/1
