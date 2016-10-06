@@ -36,7 +36,8 @@ class Word < ApplicationRecord
     related_hist.length = len
     related_hist.word_length = wl
     related_hist.save
-    puts "*"*80 + "\nword: #{self}, related_hist: #{related_hist}"
+    # puts "*"*80 + "\nword: #{self}, related_hist: #{related_hist}"
+    print '.'
     self.histogram = related_hist
     # self.histogram = Histogram.find_or_create_by(hist: hist.to_s)
     # self.histogram = Histogram.find_or_create_by(hist: hist.to_s)
