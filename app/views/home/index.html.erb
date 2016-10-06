@@ -1,20 +1,20 @@
 <h1>Home#index</h1>
 <p>Find me in app/views/home/index.html.erb</p>
 
-<%= link_to 'Word Lengths', word_lengths_path %>
+<%= link_to 'Word Lengths', word_lengths_path %> ( <%= WordLength.count %> )
 <br/>
 
-<%= link_to 'Words', words_path %>
+<%= link_to 'Words', words_path %> ( <%= Word.count %> )
 <br/>
 
-<%= link_to 'Histograms', histograms_path %>
+<%= link_to 'Histograms', histograms_path %> ( <%= Histogram.count %> )
 <br/>
 
-<%= link_to 'Hist Friends', hist_friends_path %>
+<%= link_to 'Hist Friends', hist_friends_path %> ( <%= HistFriend.count %> )
 <br/>
 
-<%= link_to 'Word Friends', word_friends_path %>
+<%= link_to 'Word Friends', word_friends_path %> ( <%= WordFriend.count %> )
 <br/>
 
-<%= link_to 'Social Nodes', social_nodes_path %>
+<%= link_to 'Social Nodes', social_nodes_path %> ( <%= SocialNode.count %> )
 <br/>
