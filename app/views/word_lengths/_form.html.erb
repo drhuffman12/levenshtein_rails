@@ -1,0 +1,22 @@
+<%= form_for(word_length) do |f| %>
+  <% if word_length.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(word_length.errors.count, "error") %> prohibited this word_length from being saved:</h2>
+
+      <ul>
+      <% word_length.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :length %>
+    <%= f.number_field :length %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

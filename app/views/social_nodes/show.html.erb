@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Word orig:</strong>
+  <%= @social_node.word_orig %>
+</p>
+
+<p>
+  <strong>Word from:</strong>
+  <%= @social_node.word_from %>
+</p>
+
+<p>
+  <strong>Word to:</strong>
+  <%= @social_node.word_to %>
+</p>
+
+<p>
+  <strong>Qty steps:</strong>
+  <%= @social_node.qty_steps %>
+</p>
+
+<%= link_to 'Edit', edit_social_node_path(@social_node) %> |
+<%= link_to 'Back', social_nodes_path %>

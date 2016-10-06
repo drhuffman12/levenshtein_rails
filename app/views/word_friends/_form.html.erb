@@ -1,0 +1,37 @@
+<%= form_for(word_friend) do |f| %>
+  <% if word_friend.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(word_friend.errors.count, "error") %> prohibited this word_friend from being saved:</h2>
+
+      <ul>
+      <% word_friend.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :word_from_id %>
+    <%= f.text_field :word_from_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :word_to_id %>
+    <%= f.text_field :word_to_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :traced_by %>
+    <%= f.text_area :traced_by %>
+  </div>
+
+  <div class="field">
+    <%= f.label :traced_last_by %>
+    <%= f.text_field :traced_last_by %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

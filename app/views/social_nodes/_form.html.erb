@@ -1,0 +1,37 @@
+<%= form_for(social_node) do |f| %>
+  <% if social_node.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(social_node.errors.count, "error") %> prohibited this social_node from being saved:</h2>
+
+      <ul>
+      <% social_node.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :word_orig_id %>
+    <%= f.text_field :word_orig_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :word_from_id %>
+    <%= f.text_field :word_from_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :word_to_id %>
+    <%= f.text_field :word_to_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :qty_steps %>
+    <%= f.number_field :qty_steps %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

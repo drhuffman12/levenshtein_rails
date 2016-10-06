@@ -1,0 +1,1 @@
+json.partial! "word_friends/word_friend", word_friend: @word_friend

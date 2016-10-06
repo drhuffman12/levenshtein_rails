@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Social Nodes</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Word orig</th>
+      <th>Word from</th>
+      <th>Word to</th>
+      <th>Qty steps</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @social_nodes.each do |social_node| %>
+      <tr>
+        <td><%= social_node.word_orig %></td>
+        <td><%= social_node.word_from %></td>
+        <td><%= social_node.word_to %></td>
+        <td><%= social_node.qty_steps %></td>
+        <td><%= link_to 'Show', social_node %></td>
+        <td><%= link_to 'Edit', edit_social_node_path(social_node) %></td>
+        <td><%= link_to 'Destroy', social_node, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Social Node', new_social_node_path %>

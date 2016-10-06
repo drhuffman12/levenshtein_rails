@@ -1,0 +1,1 @@
+json.array! @social_nodes, partial: 'social_nodes/social_node', as: :social_node

@@ -1,0 +1,2 @@
+module WordFriendsHelper
+end

@@ -1,0 +1,1 @@
+json.partial! "word_lengths/word_length", word_length: @word_length

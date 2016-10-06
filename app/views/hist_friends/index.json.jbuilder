@@ -1,0 +1,1 @@
+json.array! @hist_friends, partial: 'hist_friends/hist_friend', as: :hist_friend

@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Hist:</strong>
+  <%= @histogram.hist %>
+</p>
+
+<p>
+  <strong>Length:</strong>
+  <%= @histogram.length %>
+</p>
+
+<p>
+  <strong>Word length:</strong>
+  <%= @histogram.word_length %>
+</p>
+
+<%= link_to 'Edit', edit_histogram_path(@histogram) %> |
+<%= link_to 'Back', histograms_path %>
