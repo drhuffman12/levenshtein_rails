@@ -1,3 +1,5 @@
+require 'benchmark'
+
 # This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
 #
@@ -22,15 +24,32 @@ end
 
 def read_given_input_file
   i = 0
+  # max_words = ENV['max_words'] ? ENV['max_words'].to_i || 20 : nil
+  max_words = 100000
+  group_count = 1000
+  puts
+  puts [i, Time.now].inspect
+  puts
   File.read('./doc/input').each_line do |name|
     i += 1
 
     # TODO: add field for orig_name OR usable_name to Word
-    # Word.create(name: name) if i < 20
-    Word.create(name: Word.to_usable(name)) if i < 20
+    unless (max_words && i > max_words)
+      if i % group_count == 0
+        puts
+        puts [i, Time.now].inspect
+        puts
+      end
+      Word.create(name: name)
+    end
+    # Word.create(name: Word.to_usable(name)) # if i < 20
   end
 end
 
 # 'run':
-teardown
-read_given_input_file
+puts
+puts Benchmark.measure {
+  teardown
+  read_given_input_file
+}
+puts
