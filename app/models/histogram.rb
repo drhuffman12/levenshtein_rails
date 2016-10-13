@@ -41,9 +41,9 @@ class Histogram < ApplicationRecord
   # Histogram.friends_hist?(hist_a, hist_b)
   # Histogram.friends_hist_type(hist_a, hist_b)
   def self.friends_hist_type(hist_a, hist_b)
+    dist = distance_hist(hist_a, hist_b)
     d = delta_hist(hist_a, hist_b)
     dt = delta_trimmed(d)
-    dist = distance_hist(hist_a, hist_b)
     key_cnt = dt.keys.count
     if (dist == key_cnt)
       case dist
