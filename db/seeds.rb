@@ -77,11 +77,13 @@ def connect_hist_friends(hist_from, hist_to)
   hf.hist_from = hist_from
   hf.hist_to = hist_to
   hf.save
+  # HistFriend.find_or_create_by(hist_from_id: hist_from.id, hist_to_id: hist_to.id)
 
   hf = HistFriend.new
   hf.hist_from = hist_to
   hf.hist_to = hist_from
   hf.save
+  # HistFriend.find_or_create_by(hist_from_id: hist_to.id, hist_to_id: hist_from.id)
 end
 
 def find_hist_friends
@@ -208,6 +210,60 @@ def find_hist_friends_v2
   end
 end
 
+#
+
+def find_word_friends
+  WordLength.order(:length).each do |word_length|
+    from_hists = word_length.histograms
+    from_hists.each do |from_hist|
+      from_words = from_hist.words
+      # (from_hists - from_hist).each do |to_hist|
+      from_hists.each do |to_hist|
+        to_words = to_hist.words
+        check_for_word_friends(from_words, to_words)
+      end
+      # if from_hist.respond_to?(:hist_to_friends) # FIX: NameError: uninitialized constant Histogram::HistToFriend
+      #   from_hist.hist_to_friends.each do |to_hist|
+      #     to_words = to_hist.words
+      #     check_for_word_friends(from_words, to_words)
+      #   end
+      # else
+      #   puts "find_word_friends .. from_hist.inspect: #{from_hist.inspect}"
+      # end
+    end
+  end
+end
+
+def check_for_word_friends(from_words, to_words)
+  from_words.each do |from_word|
+    to_words.each do |to_word|
+      are_friends = Word.friends?(from_word.name, to_word.name)
+      connect_word_friends(from_word, to_word) if are_friends
+    end
+  end
+end
+
+def connect_word_friends(from_word, to_word)
+  # wf = WordFriend.new
+  wf = WordFriend.find_or_create_by(word_from_id: from_word.id, word_to_id: to_word.id)
+  wf.word_from = from_word
+  wf.word_to = to_word
+  wf.save
+  # WordFriend.find_or_create_by(word_from_id: from_word.id, word_to_id: to_word.id)
+
+  # wf = WordFriend.new
+  # wf.word_from = to_word
+  # wf.word_to = from_word
+  # wf.save
+  # # WordFriend.find_or_create_by(word_from_id: to_word.id, word_to_id: from_word.id)
+end
+
+
+# max_words = 100000
+# group_count = 10000
+
+max_words = 100
+group_count = 10
 teardown
 Benchmark.bm do |x|
   x.report('solo .. read_given_input_file') {
@@ -215,6 +271,9 @@ Benchmark.bm do |x|
   }
   x.report('solo .. find_hist_friends') {
     find_hist_friends
+  }
+  x.report('solo .. find_hist_friends') {
+    find_word_friends
   }
 end
 # puts
@@ -283,8 +342,8 @@ end
 #   }
 # end
 
-max_words = 100000
-group_count = 10000
+# max_words = 100000
+# group_count = 10000
 
 # teardown
 # Benchmark.bm do |x|

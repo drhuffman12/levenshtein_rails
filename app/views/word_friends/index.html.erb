@@ -16,8 +16,10 @@
   <tbody>
     <% @word_friends.each do |word_friend| %>
       <tr>
-        <td><%= word_friend.word_from %></td>
-        <td><%= word_friend.word_to %></td>
+        <td><%= word_friend.word_from[:id] if word_friend.word_from %></td>
+        <td><%= word_friend.word_from[:name] if word_friend.word_from %></td>
+        <td><%= word_friend.word_to[:id] if word_friend.word_from %></td>
+        <td><%= word_friend.word_to[:name] if word_friend.word_from %></td>
         <td><%= word_friend.traced_by %></td>
         <td><%= word_friend.traced_last_by %></td>
         <td><%= link_to 'Show', word_friend %></td>

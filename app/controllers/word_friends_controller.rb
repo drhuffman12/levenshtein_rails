@@ -4,7 +4,7 @@ class WordFriendsController < ApplicationController
   # GET /word_friends
   # GET /word_friends.json
   def index
-    @word_friends = WordFriend.all
+    @word_friends = WordFriend.order(:word_from_id, :word_to_id).all
   end
 
   # GET /word_friends/1
