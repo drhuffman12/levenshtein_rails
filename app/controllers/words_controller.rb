@@ -4,7 +4,7 @@ class WordsController < ApplicationController
   # GET /words
   # GET /words.json
   def index
-    @words = Word.all
+    @words = Word.order(:length, :histogram_id, :name).all
   end
 
   # GET /words/1

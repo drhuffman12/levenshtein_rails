@@ -4,7 +4,8 @@ class HistFriendsController < ApplicationController
   # GET /hist_friends
   # GET /hist_friends.json
   def index
-    @hist_friends = HistFriend.all
+    # @hist_friends = HistFriend.all
+    @hist_friends = HistFriend.order(:hist_from_id, :hist_to_id).all
   end
 
   # GET /hist_friends/1

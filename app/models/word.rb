@@ -17,8 +17,6 @@ class Word < ApplicationRecord
 
   before_save :reset_length
 
-  private
-
   def reset_length
     self.name = Word.to_usable(name)
     len = name.length
@@ -43,6 +41,8 @@ class Word < ApplicationRecord
     # self.histogram = Histogram.find_or_create_by(hist: hist.to_s)
     # self.histogram = Histogram.find_or_create_by(["hist = ?", hist])
   end
+
+  private
 
   EXCLUDE_CHARS = ["\n","\r","'","-"," "] # ["\n","\r"] # ["\n","\r","'"]
   def self.to_usable(name)

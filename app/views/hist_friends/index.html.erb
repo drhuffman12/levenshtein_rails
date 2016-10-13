@@ -7,6 +7,8 @@
     <tr>
       <th>Hist from</th>
       <th>Hist to</th>
+      <th>Hist from</th>
+      <th>Hist to</th>
       <th>Traced by</th>
       <th>Traced last by</th>
       <th colspan="3"></th>
@@ -16,8 +18,10 @@
   <tbody>
     <% @hist_friends.each do |hist_friend| %>
       <tr>
-        <td><%= hist_friend.hist_from %></td>
-        <td><%= hist_friend.hist_to %></td>
+        <td><%= hist_friend.hist_from_id %></td>
+        <td><%= hist_friend.hist_to_id %></td>
+        <td><%= hist_friend.hist_from.hist if hist_friend.hist_from %></td>
+        <td><%= hist_friend.hist_to.hist if hist_friend.hist_to %></td>
         <td><%= hist_friend.traced_by %></td>
         <td><%= hist_friend.traced_last_by %></td>
         <td><%= link_to 'Show', hist_friend %></td>

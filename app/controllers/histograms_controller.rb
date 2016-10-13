@@ -4,7 +4,7 @@ class HistogramsController < ApplicationController
   # GET /histograms
   # GET /histograms.json
   def index
-    @histograms = Histogram.all
+    @histograms = Histogram.order(:length, :hist).all
   end
 
   # GET /histograms/1

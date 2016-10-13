@@ -22,23 +22,33 @@ def teardown
   Rake::Task['db:reset'].invoke
 end
 
+# TODO: refactor to do sql commits in batches.
+# See:
+#   * http://api.rubyonrails.org/classes/ActiveRecord/Batches.html
+#   * http://weblog.jamisbuck.org/2015/10/10/bulk-inserts-in-activerecord.html
+
+## v1:
 def read_given_input_file
   i = 0
   # max_words = ENV['max_words'] ? ENV['max_words'].to_i || 20 : nil
-  max_words = 100000
-  group_count = 1000
-  puts
-  puts [i, Time.now].inspect
-  puts
+
+  # max_words = 100000
+  # group_count = 1000
+  max_words = 16
+  group_count = 4
+
+  # puts
+  # puts [i, Time.now].inspect
+  # puts
   File.read('./doc/input').each_line do |name|
     i += 1
 
     # TODO: add field for orig_name OR usable_name to Word
     unless (max_words && i > max_words)
       if i % group_count == 0
-        puts
-        puts [i, Time.now].inspect
-        puts
+        # puts
+        # puts [i, Time.now].inspect
+        # puts
       end
       Word.create(name: name)
     end
@@ -46,10 +56,181 @@ def read_given_input_file
   end
 end
 
+# def connect_hist_friends(hist_from_id, hist_to_id)
+#   hf = HistFriend.new
+#   hf.hist_from_id = hist_from_id
+#   hf.hist_to_id = hist_to_id
+#   hf.save
+#
+#   hf = HistFriend.new
+#   hf.hist_from_id = hist_to_id
+#   hf.hist_to_id = hist_from_id
+#   hf.save
+# end
+
+def connect_hist_friends(hist_from, hist_to)
+  hf = HistFriend.new
+  hf.hist_from = hist_from
+  hf.hist_to = hist_to
+  hf.save
+
+  hf = HistFriend.new
+  hf.hist_from = hist_to
+  hf.hist_to = hist_from
+  hf.save
+end
+
+def find_hist_friends
+  lens = WordLength.order(:length).pluck(:length)
+  # hists_len_m1 = []
+  hists_len_cur = []
+  hists_len_p1 = Histogram.where(length: lens.first).all
+  lens.each do |len_cur|
+    # len_m1 = len_cur - 1
+    len_p1 = len_cur + 1
+
+    # hists_len_m1 = hists_len_cur
+    hists_len_cur = hists_len_p1
+    hists_len_p1 = Histogram.where(length: len_p1).all
+
+    unless hists_len_cur.empty?
+      hists_len_cur.each do |hist_from|
+        (hists_len_cur - [hist_from]).each do |hist_to|
+          are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 2
+          connect_hist_friends(hist_from, hist_to) if are_friends
+        end
+      end
+      unless hists_len_p1.empty?
+        hists_len_cur.each do |hist_from|
+          hists_len_p1.each do |hist_to|
+            are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 1
+            connect_hist_friends(hist_from, hist_to) if are_friends
+          end
+        end
+      end
+    end
+
+  end
+end
+
+## v2:
+def read_given_input_file_v2
+  i = 0
+  # max_words = ENV['max_words'] ? ENV['max_words'].to_i || 20 : nil
+
+  # max_words = 100000
+  # group_count = 1000
+  max_words = 16
+  group_count = 4
+
+  # puts
+  # puts [i, Time.now].inspect
+  # puts
+  rec_attrs = []
+  File.read('./doc/input').each_line do |name|
+    i += 1
+
+    # TODO: add field for orig_name OR usable_name to Word
+    unless (max_words && i > max_words)
+      if i % group_count == 0
+        # puts
+        # puts [i, Time.now].inspect
+        # puts
+      end
+      # Word.create(name: name)
+      rec_attrs << {name: name}
+    end
+  end
+  Word.bulk_insert do |worker|
+    rec_attrs.each do |attrs|
+      worker.add(attrs)
+    end
+  end
+
+  # force AR before_save call-backs
+  # Word.in_batches.each_record(&:touch)
+  Word.find_in_batches.with_index do |word, index|
+    puts "Processing word ##{index}"
+    word.each(&:reset_length)
+    # word.each(&:touch)
+    word.each(&:save)
+  end
+
+end
+
+def connect_hist_friends_v2(hist_from, hist_to)
+  rec_attrs = [{hist_from: hist_from, hist_to: hist_to}, {hist_from: hist_to, hist_to: hist_from}]
+  HistFriend.bulk_insert do |worker|
+    rec_attrs.each do |attrs|
+      worker.add(attrs)
+    end
+  end
+end
+
+def find_hist_friends_v2
+  lens = WordLength.order(:length).pluck(:length)
+  # hists_len_m1 = []
+  hists_len_cur = []
+  hists_len_p1 = Histogram.where(length: lens.first).all
+  lens.each do |len_cur|
+    # len_m1 = len_cur - 1
+    len_p1 = len_cur + 1
+
+    # hists_len_m1 = hists_len_cur
+    hists_len_cur = hists_len_p1
+    hists_len_p1 = Histogram.where(length: len_p1).all
+
+    unless hists_len_cur.empty?
+      hists_len_cur.each do |hist_from|
+        (hists_len_cur - [hist_from]).each do |hist_to|
+          are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 2
+          connect_hist_friends(hist_from, hist_to) if are_friends
+          # connect_hist_friends_v2(hist_from.id, hist_to.id) if are_friends
+        end
+      end
+      unless hists_len_p1.empty?
+        hists_len_cur.each do |hist_from|
+          hists_len_p1.each do |hist_to|
+            are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 1
+            connect_hist_friends(hist_from, hist_to) if are_friends
+            # connect_hist_friends_v2(hist_from.id, hist_to.id) if are_friends
+          end
+        end
+      end
+    end
+  end
+end
+
 # 'run':
-puts
-puts Benchmark.measure {
+# # puts
+# # puts Benchmark.measure {
+#   teardown
+#   read_given_input_file
+#   find_hist_friends
+# }
+# # puts
+#
+# # puts
+# # puts Benchmark.measure {
+#   teardown
+#   read_given_input_file_v2
+#   find_hist_friends_v2
+# }
+# # puts
+
+
+# puts
+Benchmark.bm do |x|
+  # teardown
+  # x.report('solo') {
+  #   read_given_input_file
+  #   find_hist_friends
+  # }
+
   teardown
-  read_given_input_file
-}
-puts
+  x.report('bulk') {
+    read_given_input_file_v2
+    find_hist_friends_v2
+  }
+end
+# puts
