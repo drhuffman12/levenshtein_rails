@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161006013850) do
+ActiveRecord::Schema.define(version: 20161016063221) do
 
   create_table "hist_friends", force: :cascade do |t|
     t.integer  "hist_from_id"
@@ -19,6 +19,9 @@ ActiveRecord::Schema.define(version: 20161006013850) do
     t.string   "traced_last_by"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
+    t.integer  "from_length"
+    t.integer  "to_length"
+    t.string   "comment"
     t.index ["hist_from_id"], name: "index_hist_friends_on_hist_from_id"
     t.index ["hist_to_id"], name: "index_hist_friends_on_hist_to_id"
   end
@@ -51,6 +54,9 @@ ActiveRecord::Schema.define(version: 20161006013850) do
     t.string   "traced_last_by"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
+    t.integer  "from_length"
+    t.integer  "to_length"
+    t.string   "comment"
     t.index ["word_from_id"], name: "index_word_friends_on_word_from_id"
     t.index ["word_to_id"], name: "index_word_friends_on_word_to_id"
   end
