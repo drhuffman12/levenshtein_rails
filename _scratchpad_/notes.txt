@@ -1,0 +1,95 @@
+
+# See: https://www.digitalocean.com/community/tutorials/how-to-benchmark-http-latency-with-wrk-on-ubuntu-14-04
+
+wrk -t2 -c5 -d5s -H 'Host: example.com' --timeout 2s http://$APP1_PRIVATE_IP:3000/
+
+wrk -t4 -c8 -d10s --timeout 2s http://0.0.0.0:3000
+
+2016-10-04.23:26:drhuffman@drhuffman-Y700:~/_apps_/rubymine/bin/B:
+$ wrk -t4 -c8 -d10s --timeout 2s http://0.0.0.0:3000
+Running 10s test @ http://0.0.0.0:3000
+  4 threads and 8 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    72.85ms   10.78ms 135.56ms   76.90%
+    Req/Sec    22.80      9.08    40.00     69.00%
+  684 requests in 10.01s, 1.65MB read
+Requests/sec:     68.31
+Transfer/sec:    168.24KB
+
+2016-10-04.23:29:drhuffman@drhuffman-Y700:~/_apps_/rubymine/bin/B:
+$ wrk -t4 -c8 -d10s --timeout 2s http://0.0.0.0:3000
+Running 10s test @ http://0.0.0.0:3000
+  4 threads and 8 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     1.95ms    2.31ms  20.70ms   85.17%
+    Req/Sec     1.08k   331.17     1.57k    57.67%
+  32221 requests in 10.02s, 4.15MB read
+  Non-2xx or 3xx responses: 32221
+Requests/sec:   3216.53
+Transfer/sec:    424.05KB
+
+
+bundle exec rails g scaffold WordLength length:integer
+
+# bundle exec rails g scaffold Histogram word:string length:integer word_length:references
+# bundle exec rails g scaffold Histogram hist:store length:integer word_length:references
+bundle exec rails g scaffold Histogram hist:text length:integer word_length:references
+
+  store :hist, accessors: [ :color, :homepage ], coder: JSON
+bundle exec rails g scaffold Word name:string length:integer word_length:references histogram:references
+
+bundle exec rails g scaffold WordFriend word_from:references word_to:references traced_by:text traced_last_by:string
+
+bundle exec rails g scaffold HistFriend hist_from:references hist_to:references traced_by:text traced_last_by:string
+
+http://0.0.0.0:3000/
+
+bundle exec rails g controller Home index
+
+# bundle exec rails g scaffold SocialNet word_orig:references word_from:references word_to:references qty_steps:integer
+bundle exec rails g scaffold SocialNode word_orig:references word_from:references word_to:references qty_steps:integer
+
+----
+
+class SocialNode < ApplicationRecord
+  belongs_to :word_orig, autosave: true, class_name: "Word", counter_cache: true, inverse_of: :word_orig_soc_nodes
+  belongs_to :word_from, autosave: true, class_name: "Word", counter_cache: true, inverse_of: :word_from_soc_nodes
+  belongs_to :word_to, autosave: true, class_name: "Word", counter_cache: true, inverse_of: :word_to_soc_nodes
+end
+
+# belongs_to :hist_from, autosave: true, class_name: "Histogram", counter_cache: true, inverse_of: :hist_from_friends
+# belongs_to :hist_to, autosave: true, class_name: "Histogram", counter_cache: true, inverse_of: :hist_to_friends
+#
+# belongs_to :word_from, autosave: true, class_name: "Word", counter_cache: true, inverse_of: :word_from_friends
+# belongs_to :word_to, autosave: true, class_name: "Word", counter_cache: true, inverse_of: :word_to_friends
+#
+# has_many :word_orig_soc_nodes, inverse_of: :word_orig
+# has_many :word_from_soc_nodes, inverse_of: :word_from
+# has_many :word_to_soc_nodes, inverse_of: :word_to
+
+
+
+----
+
+class Histogram < ApplicationRecord
+  belongs_to :word_length
+  has_many :hist_from_friends, inverse_of: :hist_from
+  has_many :hist_to_friends, inverse_of: :hist_too
+end
+
+
+rails generate migration add_email_to_users email:string
+
+bundle exec rails generate migration add_from_length_to_hist_friends from_length:integer
+bundle exec rails generate migration add_to_length_to_hist_friends to_length:integer
+
+bundle exec rails generate migration add_from_length_to_word_friends from_length:integer
+bundle exec rails generate migration add_to_length_to_word_friends to_length:integer
+
+bundle exec rails generate migration add_comment_to_hist_friends comment:string
+bundle exec rails generate migration add_comment_to_word_friends comment:string
+
+bundle exec rails generate migration add_traversed_ids_to_words traversed_ids:string
+bundle exec rails generate migration add_is_test_case_to_words is_test_case:string
+
+bundle exec rails generate migration add_soc_net_size_to_words soc_net_size:integer
