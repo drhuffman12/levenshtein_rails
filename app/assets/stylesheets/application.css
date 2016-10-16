@@ -13,3 +13,33 @@
  *= require_tree .
  *= require_self
  */
+
+
+table {
+    width:100%;
+    border-collapse:collapse;
+}
+table th {
+    font-weight: 1.25%;
+    padding:7px;
+    border: #4e95f4 1px solid;
+    /*border: 0.1em solid gray;*/
+    background: lightgray;
+}
+table td {
+    padding:7px;
+    border: #4e95f4 1px solid;
+    /*border: 0.1em solid gray;*/
+}
+/* provide some minimal visual accomodation for IE8 and below */
+table tr{
+    background: #b8d1f3;
+}
+/*  Define the background color for all the ODD background rows  */
+table tr:nth-child(odd){
+    background: #b8d1f3;
+}
+/*  Define the background color for all the EVEN background rows  */
+table tr:nth-child(even){
+    background: #dae5f4;
+}
