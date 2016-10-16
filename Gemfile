@@ -1,12 +1,10 @@
 source 'https://rubygems.org'
-
+ruby '2.3.1'
+# ruby '2.3.1', :engine => 'jruby', :engine_version => '9.1.5.0'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.0.0', '>= 5.0.0.1'
-# Use sqlite3 as the database for Active Record
-gem 'sqlite3'
-# Use Puma as the app server
-gem 'puma', '~> 3.0'
+
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
@@ -50,3 +48,25 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # https://github.com/jamis/bulk_insertbundle
 gem 'bulk_insert'
+
+platforms :ruby do
+  # Use sqlite3 as the database for Active Record
+  gem 'sqlite3'
+  # gem 'activerecord-jdbcsqlite3-adapter'
+
+  # Use Puma as the app server
+  gem 'puma', '~> 3.0'
+  # gem 'trinidad', '~> 3.0'
+end
+
+platforms :jruby do
+  gem 'jruby-openssl'
+
+  # Use sqlite3 as the database for Active Record
+  # gem 'sqlite3'
+  gem 'activerecord-jdbcsqlite3-adapter'
+
+  # Use Puma as the app server
+  gem 'puma', '~> 3.0'
+  # gem 'trinidad', '~> 1.5.0.B2' #, '~> 1.4.6'
+end
