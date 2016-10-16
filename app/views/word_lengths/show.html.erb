@@ -5,5 +5,15 @@
   <%= @word_length.length %>
 </p>
 
+<p>
+  <strong>Histograms:</strong>
+  <%= @word_length.histograms.pluck(:hist) %>
+</p>
+
+<p>
+  <strong>words:</strong>
+  <%= @word_length.words.pluck(:name) %>
+</p>
+
 <%= link_to 'Edit', edit_word_length_path(@word_length) %> |
 <%= link_to 'Back', word_lengths_path %>

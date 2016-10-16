@@ -16,9 +16,9 @@
   <tbody>
     <% @social_nodes.each do |social_node| %>
       <tr>
-        <td><%= social_node.word_orig %></td>
-        <td><%= social_node.word_from %></td>
-        <td><%= social_node.word_to %></td>
+        <td><%= social_node.word_orig.name %></td>
+        <td><%= social_node.word_from.name %></td>
+        <td><%= social_node.word_to.name %></td>
         <td><%= social_node.qty_steps %></td>
         <td><%= link_to 'Show', social_node %></td>
         <td><%= link_to 'Edit', edit_social_node_path(social_node) %></td>

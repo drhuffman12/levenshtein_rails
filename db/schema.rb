@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161016063221) do
+ActiveRecord::Schema.define(version: 20161016092721) do
 
   create_table "hist_friends", force: :cascade do |t|
     t.integer  "hist_from_id"
@@ -74,6 +74,9 @@ ActiveRecord::Schema.define(version: 20161016063221) do
     t.integer  "histogram_id"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
+    t.string   "traversed_ids"
+    t.string   "is_test_case"
+    t.integer  "soc_net_size"
     t.index ["histogram_id"], name: "index_words_on_histogram_id"
     t.index ["word_length_id"], name: "index_words_on_word_length_id"
   end

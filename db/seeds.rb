@@ -10,22 +10,30 @@ preclean = true
 # max_words_sizes = [10, 100, 1000]
 # max_words_sizes = [10, 100]
 # max_words_sizes = [16, 32, 64, 128]
-max_words_sizes = [16, 32, 64]
+# max_words_sizes = [8, 16, 32, 64]
+# max_words_sizes = [8, 16]
 # max_words_sizes = [16, 32]
+# max_words_sizes = [16]
+max_words_sizes = [32]
+# max_words_sizes = [8]
 # step_sizes = [100, 10, 1]
-step_sizes = [4, 2, 1]
+# step_sizes = [4, 2, 1]
 # step_sizes = [8, 4, 2, 1]
+# step_sizes = [1]
 # repeats = 3
+# repeats = 2
 repeats = 1
+only_test = true
+# only_test = false
 Benchmark.bm do |x|
   max_words_sizes.each do |max_words|
-    step_sizes.each do |step|
+    # step_sizes.each do |step|
       repeats.times.each do |i|
         # group_count = 1
-        x.report("max_words: #{max_words}, step: #{step}, i: #{i}") { # , group_count: #{group_count}
-          Loader.new(input_file, max_words, step, preclean).run # , group_count
+        x.report("max_words: #{max_words}, i: #{i}") { # , group_count: #{group_count}, step: #{step}
+          Loader.new(input_file, max_words, preclean, only_test).run # , group_count, step
         }
       end
-    end
+    # end
   end
 end

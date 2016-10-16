@@ -15,31 +15,38 @@ class Word < ApplicationRecord
   has_many :word_from_soc_nodes, inverse_of: :word_from
   has_many :word_to_soc_nodes, inverse_of: :word_to
 
+  serialize :traversed_ids
+
   before_save :reset_length
 
   def reset_length
-    self.name = Word.to_usable(name)
-    len = name.length
+    usable_name = Word.to_usable(name)
+    self.name = usable_name
+    len = usable_name.length
     # hist = Word.to_simple_hist(name)
-    self.length = len
-    wl = WordLength.find_or_create_by(length: len)
-    self.word_length = wl
+    self.length ||= len
+    unless self.word_length
+      wl = WordLength.find_or_create_by(length: len)
+      self.word_length = wl
+    end
 
-    hist_tos = Word.to_simple_hist(name).to_s
-    # hist_tos = Word.to_usable_hist(name).to_s
-    # self.histogram = Histogram.find_or_create_by(hist: hist)
-    # related_hist = Histogram.find_or_create_by_hist(hist)
-    related_hist = Histogram.find_or_create_by(hist: hist_tos)
+    unless self.histogram
+      hist_tos = Word.to_simple_hist(usable_name).to_s
+      # hist_tos = Word.to_usable_hist(name).to_s
+      # self.histogram = Histogram.find_or_create_by(hist: hist)
+      # related_hist = Histogram.find_or_create_by_hist(hist)
+      related_hist = Histogram.find_or_create_by(hist: hist_tos)
 
-    related_hist.length = len
-    related_hist.word_length = wl
-    related_hist.save
-    # puts "*"*80 + "\nword: #{self}, related_hist: #{related_hist}"
-    # print '.'
-    self.histogram = related_hist
-    # self.histogram = Histogram.find_or_create_by(hist: hist.to_s)
-    # self.histogram = Histogram.find_or_create_by(hist: hist.to_s)
-    # self.histogram = Histogram.find_or_create_by(["hist = ?", hist])
+      related_hist.length = len
+      related_hist.word_length = wl
+      related_hist.save
+      # puts "*"*80 + "\nword: #{self}, related_hist: #{related_hist}"
+      # print '.'
+      self.histogram = related_hist
+      # self.histogram = Histogram.find_or_create_by(hist: hist.to_s)
+      # self.histogram = Histogram.find_or_create_by(hist: hist.to_s)
+      # self.histogram = Histogram.find_or_create_by(["hist = ?", hist])
+    end
   end
 
   private
@@ -93,6 +100,11 @@ class Word < ApplicationRecord
     hist_a = hist_a ? hist_a.histogram : Histogram.find_or_create_by(hist: Word.to_simple_hist(word_a_name).to_s)
     hist_b = hist_b ? hist_b.histogram : Histogram.find_or_create_by(hist: Word.to_simple_hist(word_b_name).to_s)
 
+    if !hist_a || !hist_b
+      msg = "#{self.class.name}##{__method__} -> word_a_name: #{word_a_name}, word_b_name: #{word_b_name}, hist_a: #{hist_a || '(nil)'}, hist_b: #{hist_b || '(nil)'}"
+      Rails.logger.debug msg
+      puts msg
+    end
     friends_hist_type = Histogram.friends_hist_type(eval(hist_a.hist), eval(hist_b.hist)) # TODO: pull from 'hist_friends' table
 
     if [-1, 1].include?(word_length_delta)
