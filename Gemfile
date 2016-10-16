@@ -41,6 +41,7 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'ruby-prof'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
@@ -50,9 +51,9 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'bulk_insert'
 
 platforms :ruby do
-  # Use sqlite3 as the database for Active Record
-  gem 'sqlite3'
-  # gem 'activerecord-jdbcsqlite3-adapter'
+  # Database driver for Active Record
+  # gem 'sqlite3'
+  gem 'pg'
 
   # Use Puma as the app server
   gem 'puma', '~> 3.0'
@@ -62,9 +63,9 @@ end
 platforms :jruby do
   gem 'jruby-openssl'
 
-  # Use sqlite3 as the database for Active Record
-  # gem 'sqlite3'
-  gem 'activerecord-jdbcsqlite3-adapter'
+  # Database driver for Active Record
+  # gem 'activerecord-jdbcsqlite3-adapter'
+  gem 'activerecord-jdbcpostgresql-adapter'
 
   # Use Puma as the app server
   gem 'puma', '~> 3.0'
