@@ -5,21 +5,39 @@
 <table>
   <thead>
     <tr>
+      <th>id</th>
+
+      <th>Word from id</th>
       <th>Word from</th>
+      <th>Word from len</th>
+
+      <th>Word to id</th>
       <th>Word to</th>
+      <th>Word to len</th>
+
+      <th>comment</th>
+
       <th>Traced by</th>
       <th>Traced last by</th>
-      <th colspan="3"></th>
+      <th colspan="3">Actions</th>
     </tr>
   </thead>
 
   <tbody>
     <% @word_friends.each do |word_friend| %>
       <tr>
+        <td><%= word_friend[:id] %></td>
+
         <td><%= word_friend.word_from[:id] if word_friend.word_from %></td>
         <td><%= word_friend.word_from[:name] if word_friend.word_from %></td>
-        <td><%= word_friend.word_to[:id] if word_friend.word_from %></td>
-        <td><%= word_friend.word_to[:name] if word_friend.word_from %></td>
+        <td><%= word_friend.word_from[:length] if word_friend.word_from %></td>
+
+        <td><%= word_friend.word_to[:id] if word_friend.word_to %></td>
+        <td><%= word_friend.word_to[:name] if word_friend.word_to %></td>
+        <td><%= word_friend.word_to[:length] if word_friend.word_to %></td>
+
+        <td><%= word_friend.comment %></td>
+
         <td><%= word_friend.traced_by %></td>
         <td><%= word_friend.traced_last_by %></td>
         <td><%= link_to 'Show', word_friend %></td>

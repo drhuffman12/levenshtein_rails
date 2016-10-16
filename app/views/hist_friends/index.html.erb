@@ -5,10 +5,18 @@
 <table>
   <thead>
     <tr>
+      <th>id</th>
+
+      <th>Hist from id</th>
       <th>Hist from</th>
+      <th>Hist from len</th>
+
+      <th>Hist to id</th>
       <th>Hist to</th>
-      <th>Hist from</th>
-      <th>Hist to</th>
+      <th>Hist to len</th>
+
+      <th>comment</th>
+
       <th>Traced by</th>
       <th>Traced last by</th>
       <th colspan="3"></th>
@@ -18,10 +26,18 @@
   <tbody>
     <% @hist_friends.each do |hist_friend| %>
       <tr>
+        <td><%= hist_friend[:id] %></td>
+
         <td><%= hist_friend.hist_from_id %></td>
-        <td><%= hist_friend.hist_to_id %></td>
         <td><%= hist_friend.hist_from.hist if hist_friend.hist_from %></td>
+        <td><%= hist_friend.hist_from.length if hist_friend.hist_from %></td>
+
+        <td><%= hist_friend.hist_to_id %></td>
         <td><%= hist_friend.hist_to.hist if hist_friend.hist_to %></td>
+        <td><%= hist_friend.hist_to.length if hist_friend.hist_to %></td>
+
+        <td><%= hist_friend.comment %></td>
+
         <td><%= hist_friend.traced_by %></td>
         <td><%= hist_friend.traced_last_by %></td>
         <td><%= link_to 'Show', hist_friend %></td>
