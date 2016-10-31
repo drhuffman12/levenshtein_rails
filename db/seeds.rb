@@ -6,10 +6,13 @@ require 'ruby-prof'
 
 input_file = './doc/input'
 preclean = true
-max_words_sizes = [10, 100, 1000, 10000, 100000]
+# max_words_sizes = [10, 100, 1000, 10000, 100000]
 # max_words_sizes = [10, 100, 1000, 10000]
 # max_words_sizes = [10, 100, 1000]
 # max_words_sizes = [10, 100]
+# max_words_sizes = [250]
+max_words_sizes = [50]
+# max_words_sizes = [10]
 # max_words_sizes = [16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072]
 # max_words_sizes = [8, 16, 32, 64]
 # max_words_sizes = [8, 16]

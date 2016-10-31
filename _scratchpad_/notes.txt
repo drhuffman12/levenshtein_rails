@@ -30,6 +30,12 @@ Transfer/sec:    424.05KB
 
 ----
 
+bundle exec rails db:migrate
+bundle exec rails db:seed
+
+----
+
+
 # Ruby/SQLite:
 
 $ bundle exec rails db:seed

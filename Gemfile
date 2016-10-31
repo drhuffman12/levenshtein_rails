@@ -47,7 +47,7 @@ end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
-# https://github.com/jamis/bulk_insertbundle
+# https://github.com/jamis/bulk_insert
 gem 'bulk_insert'
 
 platforms :ruby do

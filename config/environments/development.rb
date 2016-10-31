@@ -9,8 +9,8 @@ Rails.application.configure do
   # Do not eager load code on boot.
   config.eager_load = false
 
-  # Show full error reports.
-  config.consider_all_requests_local = true
+  # # Show full error reports.
+  # config.consider_all_requests_local = true
 
   # Enable/disable caching. By default caching is disabled.
   if Rails.root.join('tmp/caching-dev.txt').exist?
@@ -54,7 +54,7 @@ Rails.application.configure do
   
   # profiling:
   config.cache_classes = true
-  config.action_controller.consider_all_requests_local = false
+  # config.action_controller.consider_all_requests_local = false
   config.action_controller.perform_caching             = true
   config.action_view.cache_template_loading            = true
 
