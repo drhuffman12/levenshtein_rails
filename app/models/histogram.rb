@@ -2,14 +2,18 @@ class Histogram < ApplicationRecord
   belongs_to :word_length , inverse_of: :histograms
   has_many :words , inverse_of: :histogram
 
-  has_many :hist_from_friends , inverse_of: :hist_from
-  has_many :hist_to_friends , inverse_of: :hist_to
+  has_many :hist_from_friends , inverse_of: :hist_from, class_name: "HistFriend"
+  has_many :hist_to_friends , inverse_of: :hist_to, class_name: "HistFriend"
 
   # store :hist, accessors: [ :letters, :homepage ], coder: JSON
   # store :hist, coder: JSON
   serialize :hist
   # serialize :hist #, Hash
   # serialize :hist #, JSON
+
+  def hist_from_friends
+    HistFriend.where(hist_from: id)
+  end
 
   def self.combine_keys(hist_a, hist_b)
     (hist_a.keys << hist_b.keys).flatten

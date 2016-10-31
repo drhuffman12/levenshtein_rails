@@ -28,6 +28,85 @@ Running 10s test @ http://0.0.0.0:3000
 Requests/sec:   3216.53
 Transfer/sec:    424.05KB
 
+----
+
+bundle exec rails db:migrate
+bundle exec rails db:seed
+
+----
+
+
+# Ruby/SQLite:
+
+$ bundle exec rails db:seed
+       user     system      total        real
+max_words: 10, i: 0  0.480000   0.050000   0.530000 (  0.769009)
+max_words: 100, i: 0 15.410000   2.380000  17.790000 ( 28.949784)
+max_words: 1000, i: 0409.750000  38.200000 447.950000 (613.578952)
+max_words: 10000, i: 0^Crails aborted!
+
+# JRuby/SQLite:
+
+
+
+# Ruby/Postgres (pool: 5):
+
+$ bundle exec rails db:seed
+       user     system      total        real
+max_words: 10, i: 0  0.320000   0.010000   0.330000 (  0.443755)
+max_words: 100, i: 0  8.230000   0.540000   8.770000 ( 12.898689)
+max_words: 1000, i: 0345.250000  14.640000 359.890000 (479.207569)
+max_words: 10000, i: 0^Crake aborted!
+
+# Ruby/Postgres (pool: 10):
+
+$ bundle exec rails db:seed
+       user     system      total        real
+max_words: 10, i: 0  0.290000   0.020000   0.310000 (  0.419929)
+max_words: 100, i: 0  7.730000   0.510000   8.240000 ( 12.322213)
+max_words: 1000, i: 0307.530000  13.800000 321.330000 (441.339873)
+max_words: 10000, i: 0^Crake aborted!
+
+
+# Ruby/Postgres (pool: 5, prod):
+
+$ bundle exec rails db:seed
+       user     system      total        real
+max_words: 10, i: 0  0.350000   0.010000   0.360000 (  0.477628)
+max_words: 100, i: 0  8.270000   0.550000   8.820000 ( 12.961581)
+max_words: 1000, i: 0357.980000  17.020000 375.000000 (492.110968)
+max_words: 10000, i: 0^Crake aborted!
+
+
+
+
+# Ruby/Postgres (pool: 10, prod):
+
+$ bundle exec rails db:seed
+       user     system      total        real
+max_words: 10, i: 0  0.330000   0.010000   0.340000 (  0.436286)
+max_words: 100, i: 0  8.130000   0.480000   8.610000 ( 12.670269)
+max_words: 1000, i: 0375.330000  17.820000 393.150000 (531.133448))
+max_words: 10000, i: 0^Crake aborted!
+
+
+
+# JRuby/Postgres:
+
+
+
+----
+
+sudo -u postgres psql
+
+> create role levenshtein_rails with createdb login password 'levenshtein_rails_pw';
+> create role drhuffman with createdb login password 'drhuffman_pw';
+
+DISABLE_DATABASE_ENVIRONMENT_CHECK=1 RAILS_ENV=production bundle exec rake db:setup
+
+--
+
+cd ~/_dev_/levenshtein_rails
 
 bundle exec rails g scaffold WordLength length:integer
 

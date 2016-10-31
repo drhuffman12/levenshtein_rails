@@ -1,12 +1,10 @@
 source 'https://rubygems.org'
-
+ruby '2.3.1'
+# ruby '2.3.1', :engine => 'jruby', :engine_version => '9.1.5.0'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.0.0', '>= 5.0.0.1'
-# Use sqlite3 as the database for Active Record
-gem 'sqlite3'
-# Use Puma as the app server
-gem 'puma', '~> 3.0'
+
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
@@ -43,10 +41,33 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'ruby-prof'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
-# https://github.com/jamis/bulk_insertbundle
+# https://github.com/jamis/bulk_insert
 gem 'bulk_insert'
+
+platforms :ruby do
+  # Database driver for Active Record
+  # gem 'sqlite3'
+  gem 'pg'
+
+  # Use Puma as the app server
+  gem 'puma', '~> 3.0'
+  # gem 'trinidad', '~> 3.0'
+end
+
+platforms :jruby do
+  gem 'jruby-openssl'
+
+  # Database driver for Active Record
+  # gem 'activerecord-jdbcsqlite3-adapter'
+  gem 'activerecord-jdbcpostgresql-adapter'
+
+  # Use Puma as the app server
+  gem 'puma', '~> 3.0'
+  # gem 'trinidad', '~> 1.5.0.B2' #, '~> 1.4.6'
+end

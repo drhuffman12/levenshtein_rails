@@ -19,6 +19,31 @@ class Word < ApplicationRecord
 
   before_save :reset_length
 
+  def in_soc_net
+    Word.where(id: (traversed_ids - [id]))
+  end
+
+  def in_soc_net_names
+    in_soc_net.pluck(:name)
+  end
+
+  def word_friends # in_friend_net
+    # WordFriend.where(word_from_id: id).join(:words).where
+    WordFriend.where(word_from_id: id)
+  end
+
+  def word_friends_words
+    Word.where(id: word_friends ? word_friends.pluck(:word_to_id) : nil)
+  end
+
+  def word_friends_word_names
+    word_friends_words ? word_friends_words.pluck(:name) : nil
+  end
+
+  def in_friend_names
+    word_from_friends.pluck(:name)
+  end
+
   def reset_length
     usable_name = Word.to_usable(name)
     self.name = usable_name
