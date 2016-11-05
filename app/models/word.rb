@@ -20,7 +20,7 @@ class Word < ApplicationRecord
   before_save :reset_length
 
   def in_soc_net
-    Word.where(id: (traversed_ids - [id]))
+    Word.where(id: ((traversed_ids || []) - [id]))
   end
 
   def in_soc_net_names
