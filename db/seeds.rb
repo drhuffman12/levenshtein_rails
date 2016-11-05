@@ -13,8 +13,8 @@ preclean = true
 # max_words_sizes = [250]
 # max_words_sizes = [1000]
 # max_words_sizes = [83]
-max_words_sizes = [830]
-# max_words_sizes = [8300]
+# max_words_sizes = [830]
+max_words_sizes = [8300]
 # max_words_sizes = [83000]
 # max_words_sizes = []
 # max_words_sizes = [50]
@@ -98,6 +98,18 @@ Benchmark.bm do |x|
     # end
   end
 end
+
+def report(max_words_sizes)
+  File.open("report.#{max_words_sizes.last}.txt", 'w') do |f|
+    RawWord.all.each do |rw|
+      line = rw.name + ',' + (rw.word.soc_net_size || 0).to_s + "\n"
+      puts line
+      f.write(line)
+    end
+  end
+end
+
+report(max_words_sizes)
 
 =begin
 Benchmark.bm do |x|
