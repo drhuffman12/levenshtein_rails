@@ -1,0 +1,2 @@
+module RawWordsHelper
+end

@@ -7,20 +7,22 @@ class Word < ApplicationRecord
 
   belongs_to :word_length , inverse_of: :words
   belongs_to :histogram , inverse_of: :words
-  # has_many :words
-  has_many :word_from_friends, inverse_of: :word_from
-  has_many :word_to_friends, inverse_of: :word_too
 
-  has_many :word_orig_soc_nodes, inverse_of: :word_orig
-  has_many :word_from_soc_nodes, inverse_of: :word_from
-  has_many :word_to_soc_nodes, inverse_of: :word_to
+  has_many :word_from_friends, class_name: WordFriend, foreign_key: :word_from_id
+  has_many :word_to_friends, class_name: WordFriend, foreign_key: :word_to_id
+
+  has_many :word_orig_soc_nodes, class_name: SocialNode, foreign_key: :word_orig_id
+  has_many :word_from_soc_nodes, class_name: SocialNode, foreign_key: :word_from_id
+  has_many :word_to_soc_nodes, class_name: SocialNode, foreign_key: :word_to_id
+
+  has_many :raw_words
 
   serialize :traversed_ids
 
   before_save :reset_length
 
   def in_soc_net
-    Word.where(id: (traversed_ids - [id]))
+    Word.where(id: ((traversed_ids || []) - [id]))
   end
 
   def in_soc_net_names

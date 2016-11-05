@@ -1,0 +1,47 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Raw Words</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Is test case</th>
+      <th>Soc Net Size</th>
+
+      <th>Word Id</th>
+      <th>Word</th>
+      <th>Histogram</th>
+      <th>Traversed Ids</th>
+      <th>Word Friends</th>
+      <th>Soc Net Word Names</th>
+
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @raw_words.each do |raw_word| %>
+      <tr>
+        <td><%= raw_word.name %></td>
+        <td><%= raw_word.is_test_case %></td>
+        <td><%= raw_word.word.soc_net_size if raw_word.word %></td>
+
+        <td><%= raw_word.word[:id] if raw_word.word %></td>
+        <td><%= raw_word.word[:name] if raw_word.word %></td>
+        <td><%= raw_word.word.histogram[:hist] if raw_word.word.histogram %></td>
+        <td><%= raw_word.word.traversed_ids if raw_word.word %></td>
+        <td><%= raw_word.word.word_friends_word_names if raw_word.word %></td> <!--word_to_friends-->
+        <td><%= raw_word.word.in_soc_net_names if raw_word.word %></td>
+
+        <td><%= link_to 'Show', raw_word %></td>
+        <td><%= link_to 'Edit', edit_raw_word_path(raw_word) %></td>
+        <td><%= link_to 'Destroy', raw_word, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Raw Word', new_raw_word_path %>

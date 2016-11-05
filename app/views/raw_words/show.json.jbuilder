@@ -1,0 +1,1 @@
+json.partial! "raw_words/raw_word", raw_word: @raw_word

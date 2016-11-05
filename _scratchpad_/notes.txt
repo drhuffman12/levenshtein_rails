@@ -33,6 +33,10 @@ Transfer/sec:    424.05KB
 bundle exec rails db:migrate
 bundle exec rails db:seed
 
+bundle exec rails db:reset RAILS_ENV=development
+
+bundle exec rails db:reset RAILS_ENV=production DISABLE_DATABASE_ENVIRONMENT_CHECK=1
+
 ----
 
 
@@ -115,6 +119,9 @@ bundle exec rails g scaffold WordLength length:integer
 bundle exec rails g scaffold Histogram hist:text length:integer word_length:references
 
   store :hist, accessors: [ :color, :homepage ], coder: JSON
+
+bundle exec rails g scaffold RawWord name:string is_test_case:string word:references
+
 bundle exec rails g scaffold Word name:string length:integer word_length:references histogram:references
 
 bundle exec rails g scaffold WordFriend word_from:references word_to:references traced_by:text traced_last_by:string

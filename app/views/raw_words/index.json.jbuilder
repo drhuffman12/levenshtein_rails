@@ -1,0 +1,1 @@
+json.array! @raw_words, partial: 'raw_words/raw_word', as: :raw_word
