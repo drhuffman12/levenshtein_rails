@@ -1,3 +1,15 @@
+Re-Seed the data 
+
+```bash
+sh ./reseed.sh
+```
+
+Run the server 
+
+```bash
+RAILS_ENV=production bundle exec rails s
+```
+
 # README
 
 This README would normally document whatever steps are necessary to get the
