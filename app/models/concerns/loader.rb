@@ -18,6 +18,7 @@ class Loader
     find_hist_friends
     find_word_friends
     # find_word_social_net
+    SocNetBuilder.new.run
   end
 
   # def teardown
@@ -61,7 +62,10 @@ class Loader
       is_test_case = !found_END_OF_INPUT
       # Word.create(name: lines[i].chomp, is_test_case: is_test_case) unless at_END_OF_INPUT
       unless at_END_OF_INPUT
-        word = Word.find_or_create_by(name: lines[i].chomp, is_test_case: is_test_case)
+        # word = Word.find_or_create_by(name: lines[i].chomp, is_test_case: is_test_case)
+        word = Word.find_or_create_by(name: lines[i].chomp)
+        word.is_test_case = is_test_case || word.is_test_case
+        word.save
         RawWord.create(name: lines[i].chomp, is_test_case: is_test_case, word_id: word.id)
       end
       # puts "i: #{i}, name: '#{name}', @only_test: '#{@only_test}', at_END_OF_INPUT: #{at_END_OF_INPUT}, found_END_OF_INPUT: #{found_END_OF_INPUT}"
