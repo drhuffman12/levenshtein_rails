@@ -4,6 +4,15 @@ Re-Seed the data
 sh ./reseed.sh
 ```
 
+Track Progress:
+
+```bash
+RAILS_ENV=production bundle exec rails console
+# then ...
+{RawWord: RawWord.count, Histogram: Histogram.count, HistFriend: HistFriend.count, WordFriend: WordFriend.count, SocialNode: SocialNode.count}
+{RawWord: RawWord.count, Word: Word.count, Histogram: Histogram.count, HistFriend: HistFriend.count, WordFriend: WordFriend.count, WordFriend_max_word_from_id: WordFriend.maximum(:word_from_id), SocialNode: SocialNode.count, SocialNode_max_word_orig_id: SocialNode.maximum(:word_orig_id)}
+```
+
 Run the server 
 
 ```bash
