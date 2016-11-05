@@ -2,8 +2,8 @@ class Histogram < ApplicationRecord
   belongs_to :word_length , inverse_of: :histograms
   has_many :words , inverse_of: :histogram
 
-  has_many :hist_from_friends , inverse_of: :hist_from, class_name: "HistFriend"
-  has_many :hist_to_friends , inverse_of: :hist_to, class_name: "HistFriend"
+  has_many :hist_from_friends, class_name: "HistFriend", foreign_key: :hist_from_id
+  has_many :hist_to_friends, class_name: "HistFriend", foreign_key: :hist_to_id
 
   # store :hist, accessors: [ :letters, :homepage ], coder: JSON
   # store :hist, coder: JSON
