@@ -4,7 +4,7 @@ class SocialNodesController < ApplicationController
   # GET /social_nodes
   # GET /social_nodes.json
   def index
-    @social_nodes = SocialNode.all
+    @social_nodes = SocialNode.order(:word_orig_id, :word_from_id, :word_to_id).all
   end
 
   # GET /social_nodes/1

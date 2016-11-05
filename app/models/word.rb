@@ -15,6 +15,8 @@ class Word < ApplicationRecord
   has_many :word_from_soc_nodes, class_name: SocialNode, foreign_key: :word_from_id
   has_many :word_to_soc_nodes, class_name: SocialNode, foreign_key: :word_to_id
 
+  has_many :raw_words
+
   serialize :traversed_ids
 
   before_save :reset_length

@@ -9,6 +9,7 @@
       <th>Id</th>
       <th>Name</th>
       <th>Length</th>
+      <th>Raw Names</th>
       <th>Word length id</th>
       <th>Word length</th>
       <th>Histogram id</th>
@@ -28,6 +29,7 @@
         <td><%= word.id %></td>
         <td><%= word.name %></td>
         <td><%= word.length %></td>
+        <td><%= word.raw_words.pluck(:name) if word.raw_words %></td>
         <td><%= word.word_length[:id] if word.word_length %></td>
         <td><%= word.word_length[:length] if word.word_length %></td>
         <td><%= word.histogram[:id] if word.histogram %></td>
