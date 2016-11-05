@@ -17,7 +17,7 @@ class Loader
     read_input_file
     find_hist_friends
     find_word_friends
-    find_word_social_net
+    # find_word_social_net
   end
 
   # def teardown
@@ -59,25 +59,37 @@ class Loader
       at_END_OF_INPUT = (name == 'END OF INPUT')
       found_END_OF_INPUT ||= at_END_OF_INPUT
       is_test_case = !found_END_OF_INPUT
-      Word.create(name: lines[i].chomp, is_test_case: is_test_case) unless at_END_OF_INPUT
+      # Word.create(name: lines[i].chomp, is_test_case: is_test_case) unless at_END_OF_INPUT
+      unless at_END_OF_INPUT
+        word = Word.find_or_create_by(name: lines[i].chomp, is_test_case: is_test_case)
+        RawWord.create(name: lines[i].chomp, is_test_case: is_test_case, word_id: word.id)
+      end
       # puts "i: #{i}, name: '#{name}', @only_test: '#{@only_test}', at_END_OF_INPUT: #{at_END_OF_INPUT}, found_END_OF_INPUT: #{found_END_OF_INPUT}"
     end
   end
 
   def connect_hist_friends(hist_from, hist_to)
-    hf = HistFriend.new
-    hf.hist_from = hist_from
-    hf.hist_to = hist_to
-    hf.comment = 'from-to'
-    hf.save
-    # HistFriend.find_or_create_by(hist_from_id: hist_from.id, hist_to_id: hist_to.id)
+    connected = HistFriend.where(hist_from_id: hist_from.id, hist_to_id: hist_to.id)
+    unless connected.length > 0
+      # hf = HistFriend.new
+      # hf.hist_from = hist_from
+      # hf.hist_to = hist_to
+      # hf.comment = 'from-to'
+      # hf.save
+      # hf = HistFriend.find_or_create_by(hist_from_id: hist_from.id, hist_to_id: hist_to.id)
+      hf = HistFriend.create(hist_from_id: hist_from.id, hist_to_id: hist_to.id)
+      hf.comment = 'from-to'
+      hf.save
 
-    hf = HistFriend.new
-    hf.hist_from = hist_to
-    hf.hist_to = hist_from
-    hf.comment = 'to-from'
-    hf.save
-    # HistFriend.find_or_create_by(hist_from_id: hist_to.id, hist_to_id: hist_from.id)
+      # hf = HistFriend.new
+      # hf.hist_from = hist_to
+      # hf.hist_to = hist_from
+      # hf.comment = 'to-from'
+      # hf.save
+      hf = HistFriend.create(hist_from_id: hist_to.id, hist_to_id: hist_from.id)
+      hf.comment = 'to-from'
+      hf.save
+    end
   end
 
   def find_hist_friends
@@ -286,8 +298,9 @@ class Loader
   end
 
   ################################
-  def find_word_social_net
-    WordLength.includes(:words).order(:length).each do |word_length|
+  def find_word_social_net_orig
+    # WordLength.select(:id).includes(:words).order(:length).each do |word_length|
+    WordLength.select(:id).order(:length).includes(:words).each do |word_length|
       orig_words = word_length.words
       orig_words.each do |orig_word|
         to_word_friends = WordFriend.where(word_from_id: orig_word.id).order(:to_length, :word_to_id).all
@@ -299,7 +312,43 @@ class Loader
     end
   end
 
+  def find_word_social_net
+    @word_ids_to_friend_ids = {}
+    WordFriend.select(:word_from_id, :word_to_id).order(:word_from_id, :word_to_id).all.each do |wf|
+      # puts wf
+      word_from_id = wf.word_from_id
+      word_to_id = wf.word_to_id
+      @word_ids_to_friend_ids[word_from_id] ||= []
+      @word_ids_to_friend_ids[word_from_id] << word_to_id
+    end
+    # @word_ids_to_friend_ids
+
+
+    # Word.limit(5).includes(:word_to_friends).all.each do |word|
+    #   # @word_ids_and_friend_ids[word.id] = word.word_to_friends.
+    #   # puts "#{word.id} : #{word.word_to_friends}"
+    #   puts "#{word.id} : #{word.word_to_friends.pluck(:word_from_id)}"
+    # end
+
+  end
+
+  def walk_friendship_nodes_orig(orig_word, from_word, to_word_friends, qty_steps, traversed_ids)
+    to_word_friends.each do |to_word_friend|
+      to_word = to_word_friend.word_to
+      already_connected = connect_friends(orig_word, from_word, to_word, qty_steps)
+      unless already_connected
+        next_to_word_friends = WordFriend.where(word_from_id: to_word.id).where.not(word_to_id: from_word.id).order(:to_length, :word_to_id).all
+        walk_friendship_nodes(orig_word, to_word, next_to_word_friends, qty_steps + 1, traversed_ids << to_word.id)
+      end
+    end
+    traversed_ids
+  end
+
   def walk_friendship_nodes(orig_word, from_word, to_word_friends, qty_steps, traversed_ids)
+    SocialNode.where(word_orig_id: orig_word.id, word_from_id: from_word.id, word_to_id: to_word_friends, qty_steps: qty_steps)
+
+
+
     to_word_friends.each do |to_word_friend|
       to_word = to_word_friend.word_to
       already_connected = connect_friends(orig_word, from_word, to_word, qty_steps)

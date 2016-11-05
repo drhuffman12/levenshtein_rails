@@ -1,0 +1,31 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Raw Words</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Is test case</th>
+      <th>Word</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @raw_words.each do |raw_word| %>
+      <tr>
+        <td><%= raw_word.name %></td>
+        <td><%= raw_word.is_test_case %></td>
+        <td><%= raw_word.word %></td>
+        <td><%= link_to 'Show', raw_word %></td>
+        <td><%= link_to 'Edit', edit_raw_word_path(raw_word) %></td>
+        <td><%= link_to 'Destroy', raw_word, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Raw Word', new_raw_word_path %>

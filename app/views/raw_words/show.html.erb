@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @raw_word.name %>
+</p>
+
+<p>
+  <strong>Is test case:</strong>
+  <%= @raw_word.is_test_case %>
+</p>
+
+<p>
+  <strong>Word:</strong>
+  <%= @raw_word.word %>
+</p>
+
+<%= link_to 'Edit', edit_raw_word_path(@raw_word) %> |
+<%= link_to 'Back', raw_words_path %>

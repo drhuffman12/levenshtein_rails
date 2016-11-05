@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :raw_words
   resources :social_nodes
   get 'home/index'
 
