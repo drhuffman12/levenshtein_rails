@@ -1,0 +1,12 @@
+{:RawWord=>41, :Word=>39, :Histogram=>39, :HistFriend=>44, :HistFriend_max=>39, :WordFriend=>61, :WordFriend_max_word_from_id=>39, :SocialNode=>198, :SocialNode_max_word_orig_id=>39}
+
+#friends : #occurs graph
+       1 :      15 ***************
+       2 :       3 ***
+       3 :       6 ******
+       4 :       3 ***
+       5 :       2 **
+
+count of distinct #friends: 5
+
+avg #friends/word: 2.103448275862069
