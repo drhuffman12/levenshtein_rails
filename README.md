@@ -36,7 +36,44 @@ x-y z
 | xyz | 0 | (none) | (none) |
 | x-y z | 0 | (none) | (none) |
 
-* See also the `report*.txt` files for more sample runs (of various `max_words`) against [doc/input](doc/input).
+* See also the `report*.txt` files for more sample runs (of various `max_words`) against [doc/input](doc/input), such as:
+
+  * `report.21.txt`:
+```
+        horrid,0
+        basement,0
+        abbey,0
+        recursiveness,0
+        elastic,0
+        macrographies,0
+        a,0
+        aardvark,1
+        aardvark's,1
+        aardvarks,1
+        abaci,1
+        aback,1
+        abacus,2
+        abacus's,2
+        abacuses,2
+        abaft,0
+        abalone,1
+        abalone's,1
+        abalones,1
+        abandon,0
+```
+
+  * `report_friends_per_word.21.txt`:
+```
+        {:RawWord=>20, :Word=>18, :Histogram=>18, :HistFriend=>8, :HistFriend_max=>17, :WordFriend=>10, :WordFriend_max_word_from_id=>17, :SocialNode=>14, :SocialNode_max_word_orig_id=>17}
+        
+        #friends : #occurs graph
+               1 :       8 ********
+               2 :       1 *
+        
+        count of distinct #friends: 2
+        
+        avg #friends/word: 1.1111111111111112
+```
 
 ## Re-Seed the data 
 
