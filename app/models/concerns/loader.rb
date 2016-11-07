@@ -107,8 +107,8 @@ class Loader
       end
     end
     Word.select(:name, :id).order(:name, :id).pluck(:name, :id).collect{|name_and_id| @ids_per_word[name_and_id[0]] = name_and_id[1]}
-    Rails.logger.info "#{self.class.name}##{__method__} -> @words_to_add: #{@words_to_add}"
-    Rails.logger.info "#{self.class.name}##{__method__} -> @ids_per_word: #{@ids_per_word}"
+    Rails.logger.debug "#{self.class.name}##{__method__} -> @words_to_add: #{@words_to_add}"
+    Rails.logger.debug "#{self.class.name}##{__method__} -> @ids_per_word: #{@ids_per_word}"
   end
 
   def bulk_add_raw_words_v2
@@ -116,7 +116,7 @@ class Loader
       @raw_words.each do |raw_word|
         # params = raw_word.merge(word_id: @ids_per_word[raw_word[:name]])
         params = {name: raw_word[:name], is_test_case: raw_word[:is_test_case], word_id: @ids_per_word[raw_word[:word]]}
-        Rails.logger.info "#{self.class.name}##{__method__} -> raw_word: #{raw_word}, params: #{params}"
+        Rails.logger.debug "#{self.class.name}##{__method__} -> raw_word: #{raw_word}, params: #{params}"
         worker.add(params)
       end
     end
