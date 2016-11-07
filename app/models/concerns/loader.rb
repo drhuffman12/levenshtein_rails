@@ -7,6 +7,8 @@ class Loader
   end
 
   def run
+    remove_records
+
     read_input_file
     find_hist_friends
 
@@ -66,12 +68,71 @@ class Loader
 
   private
 
-  # def remove_records
-  #   ActiveRecord::Base.connection.tables.map(&:classify).map{ |name|
-  #     tbl_defined = Object.const_defined?(name)
-  #     name.constantize if tbl_defined
-  #   }.compact.each(&:delete_all)
-  # end
+  def remove_records
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+    DatabaseCleaner.start
+    DatabaseCleaner.clean
+
+    counts = {
+        WordLength: WordLength.count,
+        RawWord: RawWord.count,
+        Word: Word.count,
+        Histogram: Histogram.count,
+        WordFriend: WordFriend.count,
+        HistFriend: HistFriend.count,
+        SocialNode: SocialNode.count
+    }
+
+    msg = "\n#{self.class.name}##{__method__} -> .. Starting with record counts: #{counts.inspect}.\n"
+    puts msg
+    Rails.logger.info msg
+
+    # WordLength.destroy_all
+    # RawWord.destroy_all
+    # Word.destroy_all
+    # Histogram.destroy_all
+    # WordFriend.destroy_all
+    # HistFriend.destroy_all
+    # SocialNode.destroy_all
+
+    # ActiveRecord::Base.connection.tables.map{ |table_name|
+    #   next if table_name.match(/\Aschema_migrations\Z/) || table_name.match(/\Aar_internal_metadata\Z/)
+    #   table_name if Object.const_defined?(table_name.classify)
+    # }.compact.each do |table_name|
+    #   begin
+    #     msg = "\n#{self.class.name}##{__method__} -> Processing Table #{table_name} ...\n"
+    #     ActiveRecord::Migration.drop_table(table_name)
+    #     ActiveRecord::Migration.create_table(table_name)
+    #     msg = "\n#{self.class.name}##{__method__} -> .. Table #{table_name} cleaned.\n"
+    #     puts msg
+    #     Rails.logger.info msg
+    #   rescue => e
+    #     msg = "\n#{self.class.name}##{__method__} -> .. Table #{table_name} left alone due to error: #{e.message}.\n"
+    #     puts msg
+    #     Rails.logger.info msg
+    #   end
+    # end
+
+    # ActiveRecord::Base.connection.tables.map(&:classify).map{ |name|
+    #   tbl_defined = Object.const_defined?(name)
+    #   name.constantize if tbl_defined
+    #   # }.compact.each(&:delete_all)
+    # }.compact.each do |table|
+    #   begin
+    #     # table.delete_all
+    #     table.destroy_all
+    #     msg = "\n#{self.class.name}##{__method__} -> Table #{table} cleaned.\n"
+    #     puts msg
+    #     Rails.logger.info msg
+    #   rescue => e
+    #     msg = "\n#{self.class.name}##{__method__} -> Table #{table} left alone due to error: #{e.message}.\n"
+    #     puts msg
+    #     Rails.logger.info msg
+    #   end
+    # end
+
+  end
 
   ####
 

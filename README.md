@@ -4,7 +4,7 @@
 * See [RULES.md](doc/RULES.md).
 
 ### This approach utilizes:
- * adjustable # of words to process (currently via editing the value for `max_words` in `db/seeds.rb` or by creating a `Loader` with applicable params.)
+ * adjustable # of words to process (currently via editing the value for `max_words` (or `max_words_sizes`) in `db/seeds.rb` or by creating a `Loader` with applicable params.)
  * 'raw' words vs (filtered) 'words' (i.e.: some characters are ignored, such as '-', so "a-b" would be treated as if it is "ab") 
  * word lengths
  * the histogram of letters of each word
@@ -35,6 +35,8 @@ x-y z
 | abcde | 3 | "abcd" | "abc", "abcd", "abd"
 | xyz | 0 | (none) | (none) |
 | x-y z | 0 | (none) | (none) |
+
+* See also the `report*.txt` files for more sample runs (of various `max_words`) against [doc/input](doc/input).
 
 ## Re-Seed the data 
 
