@@ -12,6 +12,7 @@ profile = true # for generating CacheGrind performance data
 # max_words = 83000
 # max_words_sizes = [83,830,8300,83000]
 max_words_sizes = [10,21,42,83,83*2,83*4,83*8,83*8,83*16]
+max_words_sizes = [83*32,83*64,83*125,83*256,83*512,83*1024]
 # max_words_sizes = [83*8,83*16]
 # max_words_sizes = [83,83*4,83*16,83*64]
 
