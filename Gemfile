@@ -36,8 +36,9 @@ end
 
 group :test do
   gem 'simplecov', :require => false
-  gem 'database_cleaner'
+  # gem 'database_cleaner'
 end
+gem 'database_cleaner'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> anywhere in the code.

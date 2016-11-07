@@ -1,0 +1,9 @@
+horrid,0
+basement,0
+abbey,0
+recursiveness,0
+elastic,0
+macrographies,0
+a,0
+aardvark,1
+aardvark's,1
