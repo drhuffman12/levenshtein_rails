@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "histograms/new", type: :view do
   before(:each) do
     assign(:histogram, Histogram.new(
-      :hist => "MyText",
+      :hist => "{:a=>1}",
       :length => 1,
       :word_length => nil
     ))

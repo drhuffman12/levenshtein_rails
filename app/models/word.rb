@@ -15,11 +15,15 @@ class Word < ApplicationRecord
   has_many :word_from_soc_nodes, class_name: SocialNode, foreign_key: :word_from_id
   has_many :word_to_soc_nodes, class_name: SocialNode, foreign_key: :word_to_id
 
-  has_many :raw_words
+  has_many :raw_words # , class_name: RawWord, foreign_key: :id
 
   serialize :traversed_ids
 
   before_save :reset_length
+
+  # def raw_words
+  #   RawWord.where(word_id: id)
+  # end
 
   def in_soc_net
     Word.where(id: ((traversed_ids || []) - [id]))
@@ -76,12 +80,12 @@ class Word < ApplicationRecord
     end
   end
 
-  private
-
   EXCLUDE_CHARS = ["\n","\r","'","-"," "] # ["\n","\r"] # ["\n","\r","'"]
   def self.to_usable(name)
     name.split('').reject { |c| EXCLUDE_CHARS.include?(c) }.join
   end
+
+  private
 
   def self.to_simple_hist(word_name)
     hist = Hash.new(0)

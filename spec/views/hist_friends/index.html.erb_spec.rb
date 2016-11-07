@@ -6,13 +6,13 @@ RSpec.describe "hist_friends/index", type: :view do
       HistFriend.create!(
         :hist_from => nil,
         :hist_to => nil,
-        :traced_by => "MyText",
+        :traced_by => nil,
         :traced_last_by => "Traced Last By"
       ),
       HistFriend.create!(
         :hist_from => nil,
         :hist_to => nil,
-        :traced_by => "MyText",
+        :traced_by => nil,
         :traced_last_by => "Traced Last By"
       )
     ])
