@@ -237,7 +237,8 @@ class Loader
     from_words.each do |from_word|
       to_words.each do |to_word|
         to_add = {word_from_id: from_word.id, word_to_id: to_word.id}
-        to_adds << to_add if Word.friends?(from_word.name, to_word.name) && !to_adds.include?(to_add)
+        # to_adds << to_add if Word.friends?(from_word.name, to_word.name) && !to_adds.include?(to_add)
+        to_adds << to_add if Word.friends_in_mem?(from_word.name, to_word.name) && !to_adds.include?(to_add)
       end
     end
     WordFriend.bulk_insert do |worker|

@@ -120,12 +120,25 @@ class Word < ApplicationRecord
   #   end
   # end
 
+  def self.friends_in_mem?(word_a_name, word_b_name)
+    word_length_delta = word_b_name.length - word_a_name.length
+    return false unless [-1, 0, 1].include?(word_length_delta)
+    hist_a = Word.to_simple_hist(word_a_name)
+    hist_b = Word.to_simple_hist(word_b_name)
+    friends_hist_type = Histogram.friends_hist_type(hist_a, hist_b)
+    if [-1, 1].include?(word_length_delta)
+      friends_word_type_len_delta_1(word_a_name, word_b_name, friends_hist_type)
+    else
+      friends_word_type_len_delta_0(word_a_name, word_b_name, hist_a, hist_b, friends_hist_type)
+    end
+  end
+
   def self.friends?(word_a_name, word_b_name)
     word_length_delta = word_b_name.length - word_a_name.length
     return false unless [-1, 0, 1].include?(word_length_delta)
 
-    hist_a = Word.where(:name => word_a_name).first
-    hist_b = Word.where(:name => word_b_name).first
+    hist_a = Word.where(:name => word_a_name).includes(:histogram).first
+    hist_b = Word.where(:name => word_b_name).includes(:histogram).first
 
     # hist_b = Word.where(:name => word_b_name).first.histogram || Histogram.find_or_create_by(hist: Word.to_simple_hist(word_b_name).to_s)
     hist_a = hist_a ? hist_a.histogram : Histogram.find_or_create_by(hist: Word.to_simple_hist(word_a_name).to_s)
