@@ -17,6 +17,7 @@ class Loader
     read_input_file
     find_hist_friends
     find_word_friends
+
     # find_word_social_net
     SocNetBuilder.new.run
   end
@@ -40,37 +41,160 @@ class Loader
     }.compact.each(&:delete_all)
   end
 
-  def read_input_file # (input_file, max_words, group_count)
-    i = 0
+  ####
 
-    # puts
-    # puts [i, Time.now].inspect
-    # puts
+  def read_input_file
+    # read_input_file_old
+    read_input_file_new
+    # read_input_file_newer
+  end
+  def read_input_file_old # (input_file, max_words, group_count)
+    i = 0
 
     file = File.read(@input_file)
     lines = file.lines
     len = lines.length
     max = @max_words < len ? @max_words : len
 
-    # puts
+    found_END_OF_INPUT = false
+    (0...max).each do |i|
+      if !lines.blank? && lines[i]
+        name = lines[i].chomp
+        at_END_OF_INPUT = (name == 'END OF INPUT')
+        found_END_OF_INPUT ||= at_END_OF_INPUT
+        is_test_case = !found_END_OF_INPUT
+        # Word.create(name: lines[i].chomp, is_test_case: is_test_case) unless at_END_OF_INPUT
+        unless at_END_OF_INPUT
+          # word = Word.find_or_create_by(name: lines[i].chomp, is_test_case: is_test_case)
+          word = Word.find_or_create_by(name: lines[i].chomp)
+          word.is_test_case = is_test_case || word.is_test_case
+          word.save
+          RawWord.create(name: lines[i].chomp, is_test_case: is_test_case, word_id: word.id)
+        end
+      end
+    end
+  end
+
+  def read_input_file_new # (input_file, max_words, group_count)
+    i = 0
+
+    file = File.read(@input_file)
+    lines = file.lines
+    len = lines.length
+    max = @max_words < len ? @max_words : len
+
+    @words = []
+    @ids_per_word = {}
+    @raw_words_per_word = {}
+    @raw_words = []
 
     found_END_OF_INPUT = false
     (0...max).each do |i|
-      name = lines[i].chomp
-      at_END_OF_INPUT = (name == 'END OF INPUT')
-      found_END_OF_INPUT ||= at_END_OF_INPUT
-      is_test_case = !found_END_OF_INPUT
-      # Word.create(name: lines[i].chomp, is_test_case: is_test_case) unless at_END_OF_INPUT
-      unless at_END_OF_INPUT
-        # word = Word.find_or_create_by(name: lines[i].chomp, is_test_case: is_test_case)
-        word = Word.find_or_create_by(name: lines[i].chomp)
-        word.is_test_case = is_test_case || word.is_test_case
-        word.save
-        RawWord.create(name: lines[i].chomp, is_test_case: is_test_case, word_id: word.id)
+      if !lines.blank? && lines[i]
+        name = lines[i].chomp
+        at_END_OF_INPUT = (name == 'END OF INPUT')
+        found_END_OF_INPUT ||= at_END_OF_INPUT
+        is_test_case = !found_END_OF_INPUT
+        # Word.create(name: lines[i].chomp, is_test_case: is_test_case) unless at_END_OF_INPUT
+        unless at_END_OF_INPUT
+          raw_word = lines[i].chomp
+          word = Word.to_usable(raw_word)
+          unless @ids_per_word.keys.include?(word)
+            # @words << word
+            @ids_per_word[word] = Word.create(name: word).id
+          end
+          # @raw_words_per_word[word] ||= []
+          # @raw_words_per_word[word] << {name: raw_word, is_test_case: is_test_case, word_id: @ids_per_word[word]}
+          @raw_words << {name: raw_word, is_test_case: is_test_case, word_id: @ids_per_word[word]}
+        end
       end
-      # puts "i: #{i}, name: '#{name}', @only_test: '#{@only_test}', at_END_OF_INPUT: #{at_END_OF_INPUT}, found_END_OF_INPUT: #{found_END_OF_INPUT}"
+    end
+
+    # # word = Word.find_or_create_by(name: lines[i].chomp, is_test_case: is_test_case)
+    # word = Word.find_or_create_by(name: lines[i].chomp)
+    # word.is_test_case = is_test_case || word.is_test_case
+    # word.save
+    # RawWord.create(name: lines[i].chomp, is_test_case: is_test_case, word_id: word.id)
+    bulk_add_raw_words
+  end
+
+  def bulk_add_raw_words
+    RawWord.bulk_insert do |worker|
+      @raw_words.each do |raw_word|
+        worker.add(raw_word)
+      end
     end
   end
+
+  def read_input_file_newer # (input_file, max_words, group_count)
+    i = 0
+
+    file = File.read(@input_file)
+    lines = file.lines
+    len = lines.length
+    max = @max_words < len ? @max_words : len
+
+    @words = []
+    @words_to_add = []
+    @ids_per_word = {}
+    @raw_words_per_word = {}
+    @raw_words = []
+
+    found_END_OF_INPUT = false
+    (0...max).each do |i|
+      if !lines.blank? && lines[i]
+        name = lines[i].chomp
+        at_END_OF_INPUT = (name == 'END OF INPUT')
+        found_END_OF_INPUT ||= at_END_OF_INPUT
+        is_test_case = !found_END_OF_INPUT
+        # Word.create(name: lines[i].chomp, is_test_case: is_test_case) unless at_END_OF_INPUT
+        unless at_END_OF_INPUT
+          raw_word = lines[i].chomp
+          word = Word.to_usable(raw_word)
+          unless @words.include?(word)
+            @words << word
+            @words_to_add << {name: word, is_test_case: is_test_case}
+            # @ids_per_word[word] = Word.create(name: word).id
+          end
+          # @raw_words_per_word[word] ||= []
+          # @raw_words_per_word[word] << {name: raw_word, is_test_case: is_test_case} #, word_id: @ids_per_word[word]}
+          @raw_words << {name: raw_word, is_test_case: is_test_case, word: word} #, word_id: @ids_per_word[word]}
+        end
+      end
+    end
+    bulk_add_words
+
+    # # word = Word.find_or_create_by(name: lines[i].chomp, is_test_case: is_test_case)
+    # word = Word.find_or_create_by(name: lines[i].chomp)
+    # word.is_test_case = is_test_case || word.is_test_case
+    # word.save
+    # RawWord.create(name: lines[i].chomp, is_test_case: is_test_case, word_id: word.id)
+    bulk_add_raw_words_v2
+  end
+
+  def bulk_add_words
+    Word.bulk_insert do |worker|
+      @words_to_add.each do |word|
+        worker.add(word)
+      end
+    end
+    Word.select(:name, :id).order(:name, :id).pluck(:name, :id).collect{|name_and_id| @ids_per_word[name_and_id[0]] = name_and_id[1]}
+    Rails.logger.info "#{self.class.name}##{__method__} -> @words_to_add: #{@words_to_add}"
+    Rails.logger.info "#{self.class.name}##{__method__} -> @ids_per_word: #{@ids_per_word}"
+  end
+
+  def bulk_add_raw_words_v2
+    RawWord.bulk_insert do |worker|
+      @raw_words.each do |raw_word|
+        # params = raw_word.merge(word_id: @ids_per_word[raw_word[:name]])
+        params = {name: raw_word[:name], is_test_case: raw_word[:is_test_case], word_id: @ids_per_word[raw_word[:word]]}
+        Rails.logger.info "#{self.class.name}##{__method__} -> raw_word: #{raw_word}, params: #{params}"
+        worker.add(params)
+      end
+    end
+  end
+
+  ####
 
   def connect_hist_friends(hist_from, hist_to)
     connected = HistFriend.where(hist_from_id: hist_from.id, hist_to_id: hist_to.id)
