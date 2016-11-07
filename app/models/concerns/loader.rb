@@ -15,7 +15,6 @@ class Loader
     find_word_friends
     # WordFriendBuilder.new.run
 
-    # find_word_social_net
     SocNetBuilder.new.run
   end
 
@@ -69,9 +68,7 @@ class Loader
     end
   end
 
-  def read_input_file_newer # (input_file, max_words, group_count)
-    i = 0
-
+  def read_input_file_newer
     file = File.read(@input_file)
     lines = file.lines
     len = lines.length
@@ -143,19 +140,13 @@ class Loader
   end
 
   def find_hist_friends
-    # puts "\n\n#{self.class.name}##{__method__}"
     lens = WordLength.order(:length).pluck(:length)
-    # hists_len_m1 = []
-    hists_len_cur = []
     hists_len_p1 = Histogram.where(length: lens.first).all
     lens.each do |len_cur|
       # len_m1 = len_cur - 1
       len_p1 = len_cur + 1
-
-      # hists_len_m1 = hists_len_cur
       hists_len_cur = hists_len_p1
       hists_len_p1 = Histogram.where(length: len_p1).all
-
       unless hists_len_cur.empty?
         hists_len_cur.each do |hist_from|
           (hists_len_cur - [hist_from]).each do |hist_to|
@@ -172,13 +163,12 @@ class Loader
           end
         end
       end
-
     end
   end
 
   def find_word_friends
     word_lens = WordLength.includes(:histograms).includes(:words).order('word_lengths.length')
-    word_lens.each do |word_length| # .includes(:histograms)
+    word_lens.each do |word_length|
       from_hists = word_length.histograms
       from_hists.each do |from_hist|
         from_words = from_hist.words
@@ -274,62 +264,5 @@ class Loader
         worker.add(attrs)
       end
     end
-  end
-
-  ################################
-  def find_word_social_net_orig
-    WordLength.select(:id).order(:length).includes(:words).each do |word_length|
-      orig_words = word_length.words
-      orig_words.each do |orig_word|
-        to_word_friends = WordFriend.where(word_from_id: orig_word.id).order(:to_length, :word_to_id).all
-        orig_word.traversed_ids = walk_friendship_nodes(orig_word, orig_word, to_word_friends, 1, [orig_word.id])
-        orig_word.soc_net_size = orig_word.traversed_ids.length - 1
-        orig_word.save
-      end
-    end
-  end
-
-  def find_word_social_net
-    @word_ids_to_friend_ids = {}
-    WordFriend.select(:word_from_id, :word_to_id).order(:word_from_id, :word_to_id).all.each do |wf|
-      word_from_id = wf.word_from_id
-      word_to_id = wf.word_to_id
-      @word_ids_to_friend_ids[word_from_id] ||= []
-      @word_ids_to_friend_ids[word_from_id] << word_to_id
-    end
-  end
-
-  def walk_friendship_nodes_orig(orig_word, from_word, to_word_friends, qty_steps, traversed_ids)
-    to_word_friends.each do |to_word_friend|
-      to_word = to_word_friend.word_to
-      already_connected = connect_friends(orig_word, from_word, to_word, qty_steps)
-      unless already_connected
-        next_to_word_friends = WordFriend.where(word_from_id: to_word.id).where.not(word_to_id: from_word.id).order(:to_length, :word_to_id).all
-        walk_friendship_nodes(orig_word, to_word, next_to_word_friends, qty_steps + 1, traversed_ids << to_word.id)
-      end
-    end
-    traversed_ids
-  end
-
-  def walk_friendship_nodes(orig_word, from_word, to_word_friends, qty_steps, traversed_ids)
-    SocialNode.where(word_orig_id: orig_word.id, word_from_id: from_word.id, word_to_id: to_word_friends, qty_steps: qty_steps)
-    to_word_friends.each do |to_word_friend|
-      to_word = to_word_friend.word_to
-      already_connected = connect_friends(orig_word, from_word, to_word, qty_steps)
-      unless already_connected
-        next_to_word_friends = WordFriend.where(word_from_id: to_word.id).where.not(word_to_id: from_word.id).order(:to_length, :word_to_id).all
-        walk_friendship_nodes(orig_word, to_word, next_to_word_friends, qty_steps + 1, traversed_ids << to_word.id)
-      end
-    end
-    traversed_ids
-  end
-
-  def connect_friends(orig_word, from_word, to_word, qty_steps)
-    already_connected = SocialNode.where(word_orig_id: orig_word.id, word_from_id: from_word.id, word_to_id: to_word.id).first
-    unless already_connected
-      SocialNode.create(word_orig_id: orig_word.id, word_from_id: from_word.id, word_to_id: to_word.id, qty_steps: qty_steps)
-      SocialNode.create(word_orig_id: orig_word.id, word_from_id: to_word.id, word_to_id: from_word.id, qty_steps: qty_steps)
-    end
-    already_connected
   end
 end
