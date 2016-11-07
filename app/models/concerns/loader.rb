@@ -16,7 +16,9 @@ class Loader
     remove_records if @preclean
     read_input_file
     find_hist_friends
+
     find_word_friends
+    # WordFriendBuilder.new.run
 
     # find_word_social_net
     SocNetBuilder.new.run
@@ -256,35 +258,35 @@ class Loader
 
   ################################
 
-  def find_word_friends
-    # find_word_friends_v1
-    find_word_friends_v1b
-    # find_word_friends_v2
-  end
+  # def find_word_friends
+  #   # find_word_friends_v1
+  #   find_word_friends_v1b
+  #   # find_word_friends_v2
+  # end
 
   ################################
 
-  def find_word_friends_v1
-    WordLength.order(:length).each do |word_length|
-      from_length = word_length.length
-      to_length = from_length + 1
-      from_hists = word_length.histograms
-      from_hists.each do |from_hist|
-        from_words = from_hist.words
-        from_hists.each do |to_hist|
-          to_words = to_hist.words
-          check_for_word_friends(from_words, to_words, 'from-from')
-        end
-
-        hist_to_friends = HistFriend.where(hist_from_id: from_hist.id)
-        hist_to_friends.each do |hist_to_friend|
-          to_hist = hist_to_friend.hist_to
-          to_words = to_hist.words
-          check_for_word_friends(from_words, to_words, 'from-to')
-        end
-      end
-    end
-  end
+  # def find_word_friends_v1
+  #   WordLength.order(:length).each do |word_length|
+  #     from_length = word_length.length
+  #     to_length = from_length + 1
+  #     from_hists = word_length.histograms
+  #     from_hists.each do |from_hist|
+  #       from_words = from_hist.words
+  #       from_hists.each do |to_hist|
+  #         to_words = to_hist.words
+  #         check_for_word_friends(from_words, to_words, 'from-from')
+  #       end
+  #
+  #       hist_to_friends = HistFriend.where(hist_from_id: from_hist.id)
+  #       hist_to_friends.each do |hist_to_friend|
+  #         to_hist = hist_to_friend.hist_to
+  #         to_words = to_hist.words
+  #         check_for_word_friends(from_words, to_words, 'from-to')
+  #       end
+  #     end
+  #   end
+  # end
 
   ################################
   # def find_word_friends_v1b
@@ -325,64 +327,163 @@ class Loader
   #   end
   # end
 
-  def find_word_friends_v1b
+  # def find_word_friends
+  # # def find_word_friends_v1b
+  #   word_lens = WordLength.includes(:histograms).includes(:words).order('word_lengths.length')
+  #   word_lens.each do |word_length| # .includes(:histograms)
+  #     find_word_friends_per_word_length(word_length)
+  #   end
+  # end
+
+  # def find_word_friends_v1b
+  #   word_lens = WordLength.includes(:histograms).includes(:words).order('word_lengths.length')
+  #   find_word_friends_all_word_lengths(word_lens)
+  # end
+  #
+  # def find_word_friends_all_word_lengths(word_lens)
+  #   word_lens.each do |word_length| # .includes(:histograms)
+  #     find_word_friends_per_word_length(word_length)
+  #   end
+  # end
+
+  # def find_word_friends_per_word_length(word_length)
+  #   from_length = word_length.length
+  #   # to_length = from_length + 1
+  #   from_hists = word_length.histograms
+  #   from_hists.each do |from_hist|
+  #     find_word_friends_per_word_length_from_hists(from_hists, from_hist, word_length)
+  #   end
+  # end
+  #
+  # def find_word_friends_per_word_length_from_hists(from_hists, from_hist, word_length)
+  #   from_words = from_hist.words
+  #   from_from(from_hists, from_hist, from_words)
+  #   from_to(from_hist, from_words) # , to_length)
+  # end
+
+  # def find_word_friends_per_word_length(word_length)
+  #   from_length = word_length.length
+  #   # to_length = from_length + 1
+  #   from_hists = word_length.histograms
+  #   from_hists.each do |from_hist|
+  #     from_words = from_hist.words
+  #     from_from(from_hists, from_hist, from_words)
+  #     from_to(from_hist, from_words) # , to_length)
+  #   end
+  # end
+
+  # def find_word_friends
+  #   # def find_word_friends_v1b
+  #   word_lens = WordLength.includes(:histograms).includes(:words).order('word_lengths.length')
+  #   word_lens.each do |word_length| # .includes(:histograms)
+  #     from_length = word_length.length
+  #     # to_length = from_length + 1
+  #     from_hists = word_length.histograms
+  #     from_hists.each do |from_hist|
+  #       from_words = from_hist.words
+  #       from_from(from_hists, from_hist, from_words)
+  #       from_to(from_hist, from_words) # , to_length)
+  #     end
+  #   end
+  # end
+  #
+  # def from_from(from_hists, from_hist, from_words)
+  #   (from_hists - [from_hist]).each do |to_hist|
+  #     to_words = to_hist.words
+  #     check_for_word_friends(from_words, to_words, 'from-from')
+  #   end
+  # end
+  #
+  # def from_to(from_hist, from_words) # , to_length)
+  #   hist_to_friends = HistFriend.where(hist_from_id: from_hist.id) #, to_length: to_length)
+  #   hist_to_friends.each do |hist_to_friend|
+  #     to_hist = hist_to_friend.hist_to
+  #     to_words = to_hist.words
+  #     check_for_word_friends(from_words, to_words, 'from-to')
+  #   end
+  # end
+
+  def find_word_friends
+    # def find_word_friends_v1b
     word_lens = WordLength.includes(:histograms).includes(:words).order('word_lengths.length')
-    find_word_friends_all_word_lengths(word_lens)
-  end
 
-  def find_word_friends_all_word_lengths(word_lens)
+    # hist_from_to_friends = {}
+    # hist_friends = HistFriend.order(:hist_from_id).all
+    # hist_friends.each do |hf|
+    #   hist_from_id = hf.hist_from_id
+    #   hist_from_to_friends[hist_from_id] ||= []
+    #   hist_from_to_friends[hist_from_id] << hf
+    # end
+
     word_lens.each do |word_length| # .includes(:histograms)
-      find_word_friends_per_word_length(word_length)
-    end
-  end
+      from_length = word_length.length
+      # to_length = from_length + 1
 
-  def find_word_friends_per_word_length(word_length)
-    from_length = word_length.length
-    # to_length = from_length + 1
-    from_hists = word_length.histograms
-    from_hists.each do |from_hist|
-      find_word_friends_per_word_length_from_hists(from_hists, from_hist, word_length)
-    end
-  end
+      from_hists = word_length.histograms
+      # from_hists = word_length.histograms.includes(:hist_from_friends)
 
-  def find_word_friends_per_word_length_from_hists(from_hists, from_hist, word_length)
-    from_words = from_hist.words
-    from_from(from_hists, from_hist, from_words)
-    from_to(from_hist, from_words) # , to_length)
-  end
+      from_hists.each do |from_hist|
+        from_words = from_hist.words
 
+        # from_from(from_hists, from_hist, from_words)
+        (from_hists - [from_hist]).each do |to_hist|
+          to_words = to_hist.words
+          check_for_word_friends(from_words, to_words, 'from-from')
+        end
 
-  def from_from(from_hists, from_hist, from_words)
-    (from_hists - [from_hist]).each do |to_hist|
-      to_words = to_hist.words
-      check_for_word_friends(from_words, to_words, 'from-from')
-    end
-  end
+        # from_to(from_hist, from_words) # , to_length)
+        hist_to_friends = HistFriend.where(hist_from_id: from_hist.id) #, to_length: to_length)
+        # hist_to_friends = from_hist.hist_from_friends #, to_length: to_length)
+        # hist_to_friends = hist_from_to_friends[from_hist.id] # || []
 
-  def from_to(from_hist, from_words) # , to_length)
-    hist_to_friends = HistFriend.where(hist_from_id: from_hist.id) #, to_length: to_length)
-    hist_to_friends.each do |hist_to_friend|
-      to_hist = hist_to_friend.hist_to
-      to_words = to_hist.words
-      check_for_word_friends(from_words, to_words, 'from-to')
-    end
-  end
+        hist_to_friends.each do |hist_to_friend|
+          to_hist = hist_to_friend.hist_to
+          to_words = to_hist.words
+          check_for_word_friends(from_words, to_words, 'from-to')
+        end
 
-  def check_for_word_friends(from_words, to_words, comment)
-    # check_for_word_friends_orig(from_words, to_words, comment)
-    check_for_word_friends_alt(from_words, to_words, comment)
-  end
-
-  def check_for_word_friends_orig(from_words, to_words, comment)
-    from_words.each do |from_word|
-      to_words.each do |to_word|
-        WordFriend.find_or_create_by(word_from_id: from_word.id, word_to_id: to_word.id) if Word.friends?(from_word.name, to_word.name)
-        # WordFriend.create(word_from_id: from_word.id, word_to_id: to_word.id) if Word.friends?(from_word.name, to_word.name)
       end
     end
   end
 
-  def check_for_word_friends_alt(from_words, to_words, comment)
+  # def check_for_word_friends(from_words, to_words, comment)
+  #   # check_for_word_friends_orig(from_words, to_words, comment)
+  #   check_for_word_friends_alt(from_words, to_words, comment)
+  # end
+  #
+  # def check_for_word_friends_orig(from_words, to_words, comment)
+  #   from_words.each do |from_word|
+  #     to_words.each do |to_word|
+  #       WordFriend.find_or_create_by(word_from_id: from_word.id, word_to_id: to_word.id) if Word.friends?(from_word.name, to_word.name)
+  #       # WordFriend.create(word_from_id: from_word.id, word_to_id: to_word.id) if Word.friends?(from_word.name, to_word.name)
+  #     end
+  #   end
+  # end
+
+  # def check_for_word_friends(from_words, to_words, comment)
+  # # def check_for_word_friends_alt(from_words, to_words, comment)
+  #   to_adds = []
+  #   from_words.each do |from_word|
+  #     to_words.each do |to_word|
+  #       # WordFriend.find_or_create_by(word_from_id: from_word.id, word_to_id: to_word.id) if Word.friends?(from_word.name, to_word.name)
+  #       to_add = {word_from_id: from_word.id, word_to_id: to_word.id}
+  #       to_adds << to_add if Word.friends?(from_word.name, to_word.name) && !to_adds.include?(to_add)
+  #     end
+  #   end
+  #   add_friends(to_adds) #.uniq)
+  # end
+  #
+  # def add_friends(to_adds)
+  #   WordFriend.bulk_insert do |worker|
+  #     to_adds.each do |to_add|
+  #       worker.add(to_add)
+  #       # worker.add(word_orig_id: orig_id, word_from_id: to_id, word_to_id: from_id, qty_steps: step)
+  #     end
+  #   end
+  # end
+
+  def check_for_word_friends(from_words, to_words, comment)
+    # def check_for_word_friends_alt(from_words, to_words, comment)
     to_adds = []
     from_words.each do |from_word|
       to_words.each do |to_word|
@@ -391,10 +492,6 @@ class Loader
         to_adds << to_add if Word.friends?(from_word.name, to_word.name) && !to_adds.include?(to_add)
       end
     end
-    add_friends(to_adds) #.uniq)
-  end
-
-  def add_friends(to_adds)
     WordFriend.bulk_insert do |worker|
       to_adds.each do |to_add|
         worker.add(to_add)
