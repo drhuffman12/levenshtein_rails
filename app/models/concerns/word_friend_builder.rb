@@ -47,7 +47,7 @@ class WordFriendBuilder
   def cache_hist_ids_to_words
     @lengths_to_hist_ids.each_pair do |length, histogram_ids|
       histogram_ids.each do |hist_from_id|
-        @hist_ids_to_words[hist_from_id] = Word.where(histogram_id: hist_from_id)
+        @hist_ids_to_words[hist_from_id] = Word.where(histogram_id: hist_from_id).includes(:histogram)
       end
     end
   end
@@ -89,7 +89,7 @@ class WordFriendBuilder
     hist_to_friends = HistFriend.where(hist_from_id: from_hist_ids, to_length: to_length).includes(:hist_to)
     hist_to_friends.all.each do |htf|
       Rails.logger.debug "#{self.class.name}##{__method__} -> htf: #{htf}, htf.hist_to.words: #{htf.hist_to.words}"
-      to_words_partial = htf.hist_to.words
+      to_words_partial = htf.hist_to.words.includes(:histogram)
       to_words << to_words_partial # .pluck(:id,:name)
     end
     unless to_words.blank?
@@ -104,7 +104,9 @@ class WordFriendBuilder
       @friends_word_from_ids_to_word_to_ids[from_word.id] ||= []
       to_words.each do |to_word|
         # WordFriend.find_or_create_by(word_from_id: from_word.id, word_to_id: to_word.id) if Word.friends?(from_word.name, to_word.name)
-        to_adds << {word_from_id: from_word.id, word_to_id: to_word.id} if Word.friends?(from_word.name, to_word.name)
+        # to_adds << {word_from_id: from_word.id, word_to_id: to_word.id} if Word.friends?(from_word.name, to_word.name)
+        # to_adds << {word_from_id: from_word.id, word_to_id: to_word.id} if Word.friends_in_mem?(from_word.name, to_word.name)
+        to_adds << {word_from_id: from_word.id, word_to_id: to_word.id} if Word.friends_in_db?(from_word, to_word)
         @friends_word_from_ids_to_word_to_ids[from_word.id] << to_word.id
       end
     end
