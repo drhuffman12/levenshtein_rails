@@ -5,8 +5,8 @@ RSpec.describe "word_friends/new", type: :view do
     assign(:word_friend, WordFriend.new(
       :word_from => nil,
       :word_to => nil,
-      :traced_by => "MyText",
-      :traced_last_by => "MyString"
+      :traced_by => nil,
+      :traced_last_by => nil
     ))
   end
 

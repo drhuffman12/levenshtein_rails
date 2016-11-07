@@ -5,8 +5,8 @@ RSpec.describe "hist_friends/new", type: :view do
     assign(:hist_friend, HistFriend.new(
       :hist_from => nil,
       :hist_to => nil,
-      :traced_by => "MyText",
-      :traced_last_by => "MyString"
+      :traced_by => nil,
+      :traced_last_by => nil
     ))
   end
 

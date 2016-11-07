@@ -1,0 +1,6 @@
+abc
+abcd
+abd
+ab'd
+xyz
+x-y z

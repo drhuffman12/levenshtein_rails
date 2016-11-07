@@ -6,13 +6,13 @@ RSpec.describe "word_friends/index", type: :view do
       WordFriend.create!(
         :word_from => nil,
         :word_to => nil,
-        :traced_by => "MyText",
+        :traced_by => nil,
         :traced_last_by => "Traced Last By"
       ),
       WordFriend.create!(
         :word_from => nil,
         :word_to => nil,
-        :traced_by => "MyText",
+        :traced_by => nil,
         :traced_last_by => "Traced Last By"
       )
     ])

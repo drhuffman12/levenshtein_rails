@@ -4,12 +4,12 @@ RSpec.describe "histograms/index", type: :view do
   before(:each) do
     assign(:histograms, [
       Histogram.create!(
-        :hist => "MyText",
+        :hist => "{:a=>1}",
         :length => 2,
         :word_length => nil
       ),
       Histogram.create!(
-        :hist => "MyText",
+        :hist => "{:a=>1}",
         :length => 2,
         :word_length => nil
       )

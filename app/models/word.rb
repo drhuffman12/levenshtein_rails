@@ -21,6 +21,10 @@ class Word < ApplicationRecord
 
   before_save :reset_length
 
+  # def raw_words
+  #   RawWord.where(word_id: id)
+  # end
+
   def in_soc_net
     Word.where(id: ((traversed_ids || []) - [id]))
   end

@@ -52,7 +52,8 @@ class SocNetBuilder
 
   def collect_soc_net
     word_ids.each do |orig_id|
-      word = Word.find(orig_id)
+      # word = Word.find(orig_id)
+      word = Word.where(id: orig_id).first
       soc_net = word_ids_to_soc_ids[word.id]
       unless soc_net.blank?
         word.traversed_ids = soc_net

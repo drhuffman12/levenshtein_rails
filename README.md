@@ -27,6 +27,13 @@ Run the server
 RAILS_ENV=production bundle exec rails s
 ```
 
+Test
+
+```sh
+
+bundle exec rspec spec/models/concerns/loader_spec.rb -f h -o coverage/rspec.html
+```
+
 # README
 
 This README would normally document whatever steps are necessary to get the
