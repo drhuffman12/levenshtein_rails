@@ -64,7 +64,7 @@ RSpec.describe Loader, type: :model do
 
       context 'input2.txt' do
         let(:input_file) { './spec/models/concerns/input2.txt' }
-        let(:expected_report_contents) { "abc,2\nabcd,2\nabd,2\nab'd,2\nxyz,0\nx-y z,0" }
+        let(:expected_report_contents) { "abc,3\nabcd,3\nabd,3\nab'd,3\nabcde,3\nxyz,0\nx-y z,0" }
 
         it 'returns expected content ' do
           subject.run
