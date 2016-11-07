@@ -1,14 +1,12 @@
 
 class Loader
-  def initialize(input_file, max_words, preclean = true, only_test = false) # , group_count, step
+  def initialize(input_file, max_words, only_test = false)
     @input_file  = input_file
     @max_words   = max_words
-    @preclean    = preclean
     @only_test   = only_test
   end
 
   def run
-    remove_records if @preclean
     read_input_file
     find_hist_friends
 
@@ -18,12 +16,12 @@ class Loader
     SocNetBuilder.new.run
   end
 
-  def remove_records
-    ActiveRecord::Base.connection.tables.map(&:classify).map{ |name|
-      tbl_defined = Object.const_defined?(name)
-      name.constantize if tbl_defined
-    }.compact.each(&:delete_all)
-  end
+  # def remove_records
+  #   ActiveRecord::Base.connection.tables.map(&:classify).map{ |name|
+  #     tbl_defined = Object.const_defined?(name)
+  #     name.constantize if tbl_defined
+  #   }.compact.each(&:delete_all)
+  # end
 
   ####
 
@@ -165,6 +163,8 @@ class Loader
       end
     end
   end
+
+  ####
 
   def find_word_friends
     word_lens = WordLength.includes(:histograms).includes(:words).order('word_lengths.length')
