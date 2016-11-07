@@ -159,6 +159,28 @@ class Word < ApplicationRecord
 
   end
 
+  def self.friends_in_db?(word_a, word_b)
+    word_length_delta = word_b.length - word_a.length
+    return false unless [-1, 0, 1].include?(word_length_delta)
+
+    hist_a = word_a.histogram
+    hist_b = word_b.histogram
+
+    if !hist_a || !hist_b
+      msg = "#{self.class.name}##{__method__} -> word_a: #{word_a}, word_b: #{word_b}, hist_a: #{hist_a || '(nil)'}, hist_b: #{hist_b || '(nil)'}"
+      Rails.logger.debug msg
+      puts msg
+    end
+    friends_hist_type = Histogram.friends_hist_type(eval(hist_a.hist), eval(hist_b.hist)) # TODO: pull from 'hist_friends' table
+
+    if [-1, 1].include?(word_length_delta)
+      friends_word_type_len_delta_1(word_a.name, word_b.name, friends_hist_type)
+    else
+      friends_word_type_len_delta_0(word_a.name, word_b.name, hist_a, hist_b, friends_hist_type)
+    end
+
+  end
+
   private
 
   def self.friends_word_type_len_delta_1(word_a_name, word_b_name, friends_hist_type)

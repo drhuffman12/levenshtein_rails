@@ -82,7 +82,7 @@ sh ./reseed.sh
 
 # time bundle exec rails db:reset
 
-time sh ./reseed.sh
+time sh ./reseed.sh > reseed.log
 
 ```
 

@@ -23,11 +23,6 @@ class Loader
       content = report_content
       puts content
       f.write(content)
-      # RawWord.all.each do |rw|
-      # line = rw.name + ',' + (rw.word.soc_net_size || 0).to_s + "\n"
-      # puts line
-      # f.write(line)
-      # end
     end
   end
 
