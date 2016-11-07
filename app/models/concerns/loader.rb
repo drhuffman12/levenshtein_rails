@@ -21,7 +21,7 @@ class Loader
   def report # (max_words)
     File.open("report.#{@max_words}.txt", 'w') do |f|
       content = report_content
-      puts content
+      # puts content
       f.write(content)
     end
   end
