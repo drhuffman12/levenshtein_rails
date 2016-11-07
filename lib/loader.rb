@@ -1,3 +1,4 @@
+require './lib/soc_net_builder'
 
 class Loader
   def initialize(input_file, max_words, preclean = true, only_test = false) # , group_count, step
@@ -11,27 +12,18 @@ class Loader
   end
 
   def run
-    # teardown if @preclean
-    # reset if @preclean
     remove_records if @preclean
     read_input_file
     find_hist_friends
+
     find_word_friends
+    # WordFriendBuilder.new.run
+
     # find_word_social_net
     SocNetBuilder.new.run
   end
 
-  # def teardown
-  #   puts "\n\n#{self.class.name}##{__method__}"
-  #   Rake::Task['db:reset'].invoke
-  #   # Rake::Task['db:drop'].invoke
-  #   # Rake::Task['db:migrate'].invoke
-  # end
-  #
-  # def reset
-  #   Rails.application.eager_load!
-  #   ActiveRecord::Base.descendants.each { |c| c.delete_all unless c == ActiveRecord::SchemaMigration  }
-  # end
+  private
 
   def remove_records
     ActiveRecord::Base.connection.tables.map(&:classify).map{ |name|
@@ -40,56 +32,161 @@ class Loader
     }.compact.each(&:delete_all)
   end
 
-  def read_input_file # (input_file, max_words, group_count)
-    i = 0
+  def read_input_file
+    read_input_file_old
+    # read_input_file_new
+    # read_input_file_newer
+  end
 
-    # puts
-    # puts [i, Time.now].inspect
-    # puts
+  def read_input_file_old # (input_file, max_words, group_count)
+    i = 0
 
     file = File.read(@input_file)
     lines = file.lines
     len = lines.length
     max = @max_words < len ? @max_words : len
 
-    # puts
+    found_END_OF_INPUT = false
+    (0...max).each do |i|
+      if !lines.blank? && lines[i]
+        name = lines[i].chomp
+        at_END_OF_INPUT = (name == 'END OF INPUT')
+        found_END_OF_INPUT ||= at_END_OF_INPUT
+        is_test_case = !found_END_OF_INPUT
+        # Word.create(name: lines[i].chomp, is_test_case: is_test_case) unless at_END_OF_INPUT
+        unless at_END_OF_INPUT
+          # word = Word.find_or_create_by(name: lines[i].chomp, is_test_case: is_test_case)
+          word = Word.find_or_create_by(name: lines[i].chomp)
+          word.is_test_case = is_test_case || word.is_test_case
+          word.save
+          RawWord.create(name: lines[i].chomp, is_test_case: is_test_case, word_id: word.id)
+        end
+      end
+    end
+  end
+
+  def read_input_file_new # (input_file, max_words, group_count)
+    i = 0
+
+    file = File.read(@input_file)
+    lines = file.lines
+    len = lines.length
+    max = @max_words < len ? @max_words : len
+
+    @words = []
+    @ids_per_word = {}
+    @raw_words_per_word = {}
+    @raw_words = []
 
     found_END_OF_INPUT = false
     (0...max).each do |i|
-      name = lines[i].chomp
-      at_END_OF_INPUT = (name == 'END OF INPUT')
-      found_END_OF_INPUT ||= at_END_OF_INPUT
-      is_test_case = !found_END_OF_INPUT
-      # Word.create(name: lines[i].chomp, is_test_case: is_test_case) unless at_END_OF_INPUT
-      unless at_END_OF_INPUT
-        # word = Word.find_or_create_by(name: lines[i].chomp, is_test_case: is_test_case)
-        word = Word.find_or_create_by(name: lines[i].chomp)
-        word.is_test_case = is_test_case || word.is_test_case
-        word.save
-        RawWord.create(name: lines[i].chomp, is_test_case: is_test_case, word_id: word.id)
+      if !lines.blank? && lines[i]
+        name = lines[i].chomp
+        at_END_OF_INPUT = (name == 'END OF INPUT')
+        found_END_OF_INPUT ||= at_END_OF_INPUT
+        is_test_case = !found_END_OF_INPUT
+        # Word.create(name: lines[i].chomp, is_test_case: is_test_case) unless at_END_OF_INPUT
+        unless at_END_OF_INPUT
+          raw_word = lines[i].chomp
+          word = Word.to_usable(raw_word)
+          unless @ids_per_word.keys.include?(word)
+            # @words << word
+            @ids_per_word[word] = Word.create(name: word).id
+          end
+          # @raw_words_per_word[word] ||= []
+          # @raw_words_per_word[word] << {name: raw_word, is_test_case: is_test_case, word_id: @ids_per_word[word]}
+          @raw_words << {name: raw_word, is_test_case: is_test_case, word_id: @ids_per_word[word]}
+        end
       end
-      # puts "i: #{i}, name: '#{name}', @only_test: '#{@only_test}', at_END_OF_INPUT: #{at_END_OF_INPUT}, found_END_OF_INPUT: #{found_END_OF_INPUT}"
+    end
+
+    # # word = Word.find_or_create_by(name: lines[i].chomp, is_test_case: is_test_case)
+    # word = Word.find_or_create_by(name: lines[i].chomp)
+    # word.is_test_case = is_test_case || word.is_test_case
+    # word.save
+    # RawWord.create(name: lines[i].chomp, is_test_case: is_test_case, word_id: word.id)
+    bulk_add_raw_words
+  end
+
+  def bulk_add_raw_words
+    RawWord.bulk_insert do |worker|
+      @raw_words.each do |raw_word|
+        worker.add(raw_word)
+      end
+    end
+  end
+
+  def read_input_file_newer # (input_file, max_words, group_count)
+    i = 0
+
+    file = File.read(@input_file)
+    lines = file.lines
+    len = lines.length
+    max = @max_words < len ? @max_words : len
+
+    @words = []
+    @words_to_add = []
+    @ids_per_word = {}
+    @raw_words_per_word = {}
+    @raw_words = []
+
+    found_END_OF_INPUT = false
+    (0...max).each do |i|
+      if !lines.blank? && lines[i]
+        name = lines[i].chomp
+        at_END_OF_INPUT = (name == 'END OF INPUT')
+        found_END_OF_INPUT ||= at_END_OF_INPUT
+        is_test_case = !found_END_OF_INPUT
+        # Word.create(name: lines[i].chomp, is_test_case: is_test_case) unless at_END_OF_INPUT
+        unless at_END_OF_INPUT
+          raw_word = lines[i].chomp
+          word = Word.to_usable(raw_word)
+          unless @words.include?(word)
+            @words << word
+            @words_to_add << {name: word, is_test_case: is_test_case}
+            # @ids_per_word[word] = Word.create(name: word).id
+          end
+          # @raw_words_per_word[word] ||= []
+          # @raw_words_per_word[word] << {name: raw_word, is_test_case: is_test_case} #, word_id: @ids_per_word[word]}
+          @raw_words << {name: raw_word, is_test_case: is_test_case} #, word_id: @ids_per_word[word]}
+        end
+      end
+    end
+    bulk_add_words
+
+    # # word = Word.find_or_create_by(name: lines[i].chomp, is_test_case: is_test_case)
+    # word = Word.find_or_create_by(name: lines[i].chomp)
+    # word.is_test_case = is_test_case || word.is_test_case
+    # word.save
+    # RawWord.create(name: lines[i].chomp, is_test_case: is_test_case, word_id: word.id)
+    bulk_add_raw_words_v2
+  end
+
+  def bulk_add_words
+    Word.bulk_insert do |worker|
+      @words_to_add.each do |word|
+        worker.add(word)
+      end
+    end
+    Word.select(:name, :id).order(:name, :id).pluck(:name, :id).collect{|name_and_id| @ids_per_word[name_and_id[0]] = name_and_id[1]}
+  end
+
+  def bulk_add_raw_words_v2
+    RawWord.bulk_insert do |worker|
+      @raw_words.each do |raw_word|
+        params = raw_word.merge(word_id: @ids_per_word[raw_word[:name]])
+        worker.add(params)
+      end
     end
   end
 
   def connect_hist_friends(hist_from, hist_to)
     connected = HistFriend.where(hist_from_id: hist_from.id, hist_to_id: hist_to.id)
     unless connected.length > 0
-      # hf = HistFriend.new
-      # hf.hist_from = hist_from
-      # hf.hist_to = hist_to
-      # hf.comment = 'from-to'
-      # hf.save
-      # hf = HistFriend.find_or_create_by(hist_from_id: hist_from.id, hist_to_id: hist_to.id)
       hf = HistFriend.create(hist_from_id: hist_from.id, hist_to_id: hist_to.id)
       hf.comment = 'from-to'
       hf.save
 
-      # hf = HistFriend.new
-      # hf.hist_from = hist_to
-      # hf.hist_to = hist_from
-      # hf.comment = 'to-from'
-      # hf.save
       hf = HistFriend.create(hist_from_id: hist_to.id, hist_to_id: hist_from.id)
       hf.comment = 'to-from'
       hf.save
@@ -97,16 +194,11 @@ class Loader
   end
 
   def find_hist_friends
-    # puts "\n\n#{self.class.name}##{__method__}"
     lens = WordLength.order(:length).pluck(:length)
-    # hists_len_m1 = []
     hists_len_cur = []
     hists_len_p1 = Histogram.where(length: lens.first).all
     lens.each do |len_cur|
-      # len_m1 = len_cur - 1
       len_p1 = len_cur + 1
-
-      # hists_len_m1 = hists_len_cur
       hists_len_cur = hists_len_p1
       hists_len_p1 = Histogram.where(length: len_p1).all
 
@@ -133,48 +225,37 @@ class Loader
   ################################
 
   def find_word_friends
-    # find_word_friends_v1
     find_word_friends_v1b
     # find_word_friends_v2
   end
 
   ################################
 
-  def find_word_friends_v1
-    WordLength.order(:length).each do |word_length|
-      from_length = word_length.length
-      to_length = from_length + 1
-      from_hists = word_length.histograms
-      from_hists.each do |from_hist|
-        from_words = from_hist.words
-        from_hists.each do |to_hist|
-          to_words = to_hist.words
-          check_for_word_friends(from_words, to_words, 'from-from')
-        end
-
-        hist_to_friends = HistFriend.where(hist_from_id: from_hist.id)
-        hist_to_friends.each do |hist_to_friend|
-          to_hist = hist_to_friend.hist_to
-          to_words = to_hist.words
-          check_for_word_friends(from_words, to_words, 'from-to')
-        end
-      end
-    end
-  end
-
   def find_word_friends_v1b
-    word_lengths = WordLength.includes(:histograms).includes(:words).order('word_lengths.length')
-    word_lengths.each do |word_length| # .includes(:histograms)
-      from_length = word_length.length
-      # to_length = from_length + 1
-      from_hists = word_length.histograms
-      from_hists.each do |from_hist|
-        from_words = from_hist.words
-        from_from(from_hists, from_hist, from_words)
-        from_to(from_hist, from_words)
-      end
+    word_lens = WordLength.includes(:histograms).includes(:words).order('word_lengths.length')
+  end
+
+  def find_word_friends_all_word_lengths(word_lens)
+    word_lens.each do |word_length| # .includes(:histograms)
+      find_word_friends_per_word_length(word_length)
     end
   end
+
+  def find_word_friends_per_word_length(word_length)
+    from_length = word_length.length
+    # to_length = from_length + 1
+    from_hists = word_length.histograms
+    from_hists.each do |from_hist|
+      find_word_friends_per_word_length_from_hists(from_hists, from_hist, word_length)
+    end
+  end
+
+  def find_word_friends_per_word_length_from_hists(from_hists, from_hist, word_length)
+    from_words = from_hist.words
+    from_from(from_hists, from_hist, from_words)
+    from_to(from_hist, from_words) # , to_length)
+  end
+
 
   def from_from(from_hists, from_hist, from_words)
     (from_hists - [from_hist]).each do |to_hist|
@@ -183,8 +264,8 @@ class Loader
     end
   end
 
-  def from_to(from_hist, from_words)
-    hist_to_friends = HistFriend.where(hist_from_id: from_hist.id)
+  def from_to(from_hist, from_words) # , to_length)
+    hist_to_friends = HistFriend.where(hist_from_id: from_hist.id) #, to_length: to_length)
     hist_to_friends.each do |hist_to_friend|
       to_hist = hist_to_friend.hist_to
       to_words = to_hist.words
@@ -193,12 +274,37 @@ class Loader
   end
 
   def check_for_word_friends(from_words, to_words, comment)
+    check_for_word_friends_orig(from_words, to_words, comment)
+    # check_for_word_friends_alt(from_words, to_words, comment)
+  end
+  def check_for_word_friends_orig(from_words, to_words, comment)
     from_words.each do |from_word|
       to_words.each do |to_word|
-        WordFriend.find_or_create_by(word_from_id: from_word.id, word_to_id: to_word.id) if Word.friends?(from_word.name, to_word.name)
+        # WordFriend.find_or_create_by(word_from_id: from_word.id, word_to_id: to_word.id) if Word.friends?(from_word.name, to_word.name)
+        WordFriend.create(word_from_id: from_word.id, word_to_id: to_word.id) if Word.friends?(from_word.name, to_word.name)
       end
     end
   end
+
+  # def check_for_word_friends_alt(from_words, to_words, comment)
+  #   to_adds = []
+  #   from_words.each do |from_word|
+  #     to_words.each do |to_word|
+  #       # WordFriend.find_or_create_by(word_from_id: from_word.id, word_to_id: to_word.id) if Word.friends?(from_word.name, to_word.name)
+  #       to_adds << {word_from_id: from_word.id, word_to_id: to_word.id} if Word.friends?(from_word.name, to_word.name)
+  #     end
+  #   end
+  #   add_friends(to_adds)
+  # end
+  #
+  # def add_friends(to_adds)
+  #   WordFriend.bulk_insert do |worker|
+  #     to_adds.each do |to_add|
+  #       worker.add(to_add)
+  #       # worker.add(word_orig_id: orig_id, word_from_id: to_id, word_to_id: from_id, qty_steps: step)
+  #     end
+  #   end
+  # end
 
   ################################
 
@@ -212,10 +318,10 @@ class Loader
   end
 
   def find_word_friends_v2
-    word_lengths = WordLength.order(:length).all
+    word_lengths = WordLength.select(:length).order(:length).all.pluck(:length)
     hists_and_words_per_length = {}
     word_lengths.each do |word_length|
-      len = word_length.length
+      len = word_length #.length
       hists_and_words_per_length[len] = Histogram.where(:length => len).includes(:words).to_a # , :hist_to_friends
     end
 
@@ -223,7 +329,7 @@ class Loader
     # puts ".. word_lengths: #{word_lengths}" if word_lengths
     # puts ".. hists_and_words_per_length: #{hists_and_words_per_length}" if hists_and_words_per_length
 
-    (1...word_lengths.length).each do |len|
+    word_lengths.each do |len|
       cur_hists_and_words = hists_and_words_per_length[len]
       next_hists_and_words = hists_and_words_per_length[len+1]
 

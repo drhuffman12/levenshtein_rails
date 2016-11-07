@@ -1,3 +1,7 @@
+require 'simplecov'
+SimpleCov.start 'rails'
+$LOAD_PATH << '../lib'
+
 ## From 'test' folder:
 
 ENV['RAILS_ENV'] ||= 'test'

@@ -1,6 +1,6 @@
 class SocNetBuilder
 
-  attr_reader :word_ids, :word_ids_to_friend_ids
+  attr_reader :word_ids, :word_ids_to_friend_ids, :word_ids_to_soc_ids
 
   def initialize
     @word_ids = []
@@ -15,8 +15,10 @@ class SocNetBuilder
     collect_soc_net_per_word
   end
 
+  private
+
   def cache_words_and_friends
-    Rails.logger.info "#{self.class.name}##{__method__}"
+    Rails.logger.debug "#{self.class.name}##{__method__}"
     WordFriend.select(:word_from_id, :word_to_id).order(:word_from_id, :word_to_id).all.each do |word_friend|
       cache_word_friends(word_friend)
     end
@@ -53,7 +55,7 @@ class SocNetBuilder
   def collect_soc_net
     word_ids.each do |orig_id|
       word = Word.find(orig_id)
-      soc_net = @word_ids_to_soc_ids[word.id]
+      soc_net = word_ids_to_soc_ids[word.id]
       unless soc_net.blank?
         word.traversed_ids = soc_net
         word.soc_net_size = soc_net.length
@@ -63,7 +65,7 @@ class SocNetBuilder
   end
 
   def connect_set(orig_id, from_id, to_ids, step)
-    Rails.logger.info "#{self.class.name}##{__method__} -> orig_id: #{orig_id}, from_id: #{from_id}, to_ids: #{to_ids}, step: #{step}"
+    Rails.logger.debug "#{self.class.name}##{__method__} -> orig_id: #{orig_id}, from_id: #{from_id}, to_ids: #{to_ids}, step: #{step}"
     unless to_ids.blank?
       allowed_to_ids = to_ids - [orig_id]
       SocialNode.bulk_insert do |worker|
@@ -76,7 +78,7 @@ class SocNetBuilder
   end
 
   def jump_to_set(orig_id, from_id, to_ids, step)
-    Rails.logger.info "#{self.class.name}##{__method__} -> orig_id: #{orig_id}, from_id: #{from_id}, to_ids: #{to_ids}, step: #{step}"
+    Rails.logger.debug "#{self.class.name}##{__method__} -> orig_id: #{orig_id}, from_id: #{from_id}, to_ids: #{to_ids}, step: #{step}"
     unless to_ids.blank?
       allowed_to_ids = to_ids - [orig_id]
       allowed_to_ids.each do |next_from_id|
@@ -88,11 +90,11 @@ class SocNetBuilder
           not_yet_connected_to_ids = next_to_ids - been_from_to_ids
           not_yet_jumped_to_to_ids = next_to_ids - been_to_ids
 
-          Rails.logger.info "#{self.class.name}##{__method__} -> .. next_to_ids: #{next_to_ids}"
-          Rails.logger.info "#{self.class.name}##{__method__} -> .. .. been_to_ids: #{been_to_ids}"
-          Rails.logger.info "#{self.class.name}##{__method__} -> .. .. been_from_to_ids: #{been_from_to_ids}"
-          Rails.logger.info "#{self.class.name}##{__method__} -> .. .. not_yet_connected_to_ids: #{not_yet_connected_to_ids}"
-          Rails.logger.info "#{self.class.name}##{__method__} -> .. .. not_yet_jumped_to_to_ids: #{not_yet_jumped_to_to_ids}"
+          Rails.logger.debug "#{self.class.name}##{__method__} -> .. next_to_ids: #{next_to_ids}"
+          Rails.logger.debug "#{self.class.name}##{__method__} -> .. .. been_to_ids: #{been_to_ids}"
+          Rails.logger.debug "#{self.class.name}##{__method__} -> .. .. been_from_to_ids: #{been_from_to_ids}"
+          Rails.logger.debug "#{self.class.name}##{__method__} -> .. .. not_yet_connected_to_ids: #{not_yet_connected_to_ids}"
+          Rails.logger.debug "#{self.class.name}##{__method__} -> .. .. not_yet_jumped_to_to_ids: #{not_yet_jumped_to_to_ids}"
 
           connect_set(orig_id, next_from_id, not_yet_connected_to_ids, step + 1)
           jump_to_set(orig_id, next_from_id, not_yet_jumped_to_to_ids, step + 1)
@@ -105,11 +107,11 @@ class SocNetBuilder
       # not_yet_connected_to_ids = to_ids - been_from_to_ids
       # not_yet_jumped_to_to_ids = to_ids - been_to_ids
       #
-      # Rails.logger.info "#{self.class.name}##{__method__} -> .. to_ids: #{to_ids}"
-      # Rails.logger.info "#{self.class.name}##{__method__} -> .. .. been_to_ids: #{been_to_ids}"
-      # Rails.logger.info "#{self.class.name}##{__method__} -> .. .. been_from_to_ids: #{been_from_to_ids}"
-      # Rails.logger.info "#{self.class.name}##{__method__} -> .. .. not_yet_connected_to_ids: #{not_yet_connected_to_ids}"
-      # Rails.logger.info "#{self.class.name}##{__method__} -> .. .. not_yet_jumped_to_to_ids: #{not_yet_jumped_to_to_ids}"
+      # Rails.logger.debug "#{self.class.name}##{__method__} -> .. to_ids: #{to_ids}"
+      # Rails.logger.debug "#{self.class.name}##{__method__} -> .. .. been_to_ids: #{been_to_ids}"
+      # Rails.logger.debug "#{self.class.name}##{__method__} -> .. .. been_from_to_ids: #{been_from_to_ids}"
+      # Rails.logger.debug "#{self.class.name}##{__method__} -> .. .. not_yet_connected_to_ids: #{not_yet_connected_to_ids}"
+      # Rails.logger.debug "#{self.class.name}##{__method__} -> .. .. not_yet_jumped_to_to_ids: #{not_yet_jumped_to_to_ids}"
       #
       # connect_set(orig_id, from_id, not_yet_connected_to_ids, step + 1)
       # jump_to_set(orig_id, from_id, not_yet_jumped_to_to_ids, step + 1)
