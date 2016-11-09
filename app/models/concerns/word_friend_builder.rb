@@ -1,4 +1,4 @@
-
+# TODO: Pull code out of Loader and into WordFriendBuilder (i.e.: replace broken code in WordFriendBuilder with code form Loader)
 # wfb = WordFriendBuilder.new; wfb.run;nil
 # wfb.lengths_to_hist_ids
 # wfb.friends_word_from_ids_to_word_to_ids
@@ -6,12 +6,10 @@
 
 class WordFriendBuilder
 
-  # attr_reader :writable
   attr_reader :lengths, :lengths_to_hist_ids #, :hist_ids_to_hist_friends_ids
   attr_reader :hist_ids_to_words, :friends_word_from_ids_to_word_to_ids
 
-  def initialize # (writable = true)
-    # @writable = writable
+  def initialize
     @lengths = []
     @lengths_to_hist_ids = {}
     @hist_ids_to_hist_friends_ids = {}
@@ -39,11 +37,9 @@ class WordFriendBuilder
     length = word_length.length
     histograms = word_length.histograms.includes(:words)
     Rails.logger.debug "#{self.class.name}##{__method__} -> word_length: #{word_length}, length: #{length}, histograms: #{histograms}"
-    # @lengths_to_hist_ids[length] ||= []
     @lengths_to_hist_ids[length] = histograms.pluck(:id)
   end
 
-  # def cache_hist_ids_to_hist_friends_ids
   def cache_hist_ids_to_words
     @lengths_to_hist_ids.each_pair do |length, histogram_ids|
       histogram_ids.each do |hist_from_id|
@@ -66,8 +62,6 @@ class WordFriendBuilder
         from_words = hist_ids_to_words[from_hist_id]
         from_from(from_hist_ids, from_hist_id, from_words)
         from_to(from_hist_ids, from_words, to_length)
-        # from_hist_ids = [1]; to_length = 2; hist_to_friends = HistFriend.where(hist_from_id: from_hist_ids, to_length: to_length).includes(:words)
-
       end
     end
   end
@@ -82,10 +76,8 @@ class WordFriendBuilder
 
   def from_to(from_hist_ids, from_words, to_length)
     Rails.logger.debug "#{self.class.name}##{__method__} -> from_hist_ids: #{from_hist_ids}, from_words: #{from_words}, to_length: #{to_length}"
-    # hist_to_friends = HistFriend.where(hist_from_id: from_hist_ids, length: to_length).includes(:words)
     to_words = []
 
-    # from_hist_ids = [7]; to_length = 2;
     hist_to_friends = HistFriend.where(hist_from_id: from_hist_ids, to_length: to_length).includes(:hist_to)
     hist_to_friends.all.each do |htf|
       Rails.logger.debug "#{self.class.name}##{__method__} -> htf: #{htf}, htf.hist_to.words: #{htf.hist_to.words}"
@@ -103,14 +95,10 @@ class WordFriendBuilder
     from_words.each do |from_word|
       @friends_word_from_ids_to_word_to_ids[from_word.id] ||= []
       to_words.each do |to_word|
-        # WordFriend.find_or_create_by(word_from_id: from_word.id, word_to_id: to_word.id) if Word.friends?(from_word.name, to_word.name)
-        # to_adds << {word_from_id: from_word.id, word_to_id: to_word.id} if Word.friends?(from_word.name, to_word.name)
-        # to_adds << {word_from_id: from_word.id, word_to_id: to_word.id} if Word.friends_in_mem?(from_word.name, to_word.name)
         to_adds << {word_from_id: from_word.id, word_to_id: to_word.id} if Word.friends_in_db?(from_word, to_word)
         @friends_word_from_ids_to_word_to_ids[from_word.id] << to_word.id
       end
     end
-    # Rails.logger.debug "#{self.class.name}##{__method__} -> from_hist_ids: #{from_hist_ids}, from_word.id: #{from_word.id}, to_word.id: #{to_word.id}"
     Rails.logger.debug "#{self.class.name}##{__method__} -> from_words: #{from_words}, to_words: #{to_words}, to_adds: #{to_adds}"
     add_friends(to_adds) # if writable
   end
@@ -119,7 +107,6 @@ class WordFriendBuilder
     WordFriend.bulk_insert do |worker|
       to_adds.each do |to_add|
         worker.add(to_add)
-        # worker.add(word_orig_id: orig_id, word_from_id: to_id, word_to_id: from_id, qty_steps: step)
       end
     end
   end
