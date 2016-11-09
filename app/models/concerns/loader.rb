@@ -171,29 +171,62 @@ class Loader
   end
 
   def find_hist_friends
-    lens = WordLength.order(:length).pluck(:length)
+    # lens = WordLength.order(:length).pluck(:length)
+    lens_and_hists = WordLength.order(:length).includes(:histograms)
+    lens = []
+    @hists_per_len = {}
+    lens_and_hists.each do |lh|
+      len = lh.length
+      lens << len
+      hists = lh.histograms.all
+      @hists_per_len[len] = hists
+    end
     hists_len_p1 = Histogram.where(length: lens.first).all
     lens.each do |len_cur|
       # len_m1 = len_cur - 1
       len_p1 = len_cur + 1
       # hists_len_cur = hists_len_p1
-      hists_len_cur = Histogram.where(length: len_cur).all
-      hists_len_p1 = Histogram.where(length: len_p1).all
-      unless hists_len_cur.empty?
-        hists_len_cur.each do |hist_from|
-          (hists_len_cur - [hist_from]).each do |hist_to|
-            are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 2
-            connect_hist_friends(hist_from, hist_to) if are_friends
-          end
+      # hists_len_cur = Histogram.where(length: len_cur).all
+      # hists_len_p1 = Histogram.where(length: len_p1).all
+      hists_len_cur = @hists_per_len[len_cur]
+      hists_len_p1 = @hists_per_len[len_p1]
+      unless hists_len_cur.blank?
+        # hists_len_cur.each do |hist_from|
+        #   (hists_len_cur - [hist_from]).each do |hist_to|
+        #     are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 2
+        #     connect_hist_friends(hist_from, hist_to) if are_friends
+        #   end
+        # end
+        hist_from_from(hists_len_cur)
+        unless hists_len_p1.blank?
+          # hists_len_cur.each do |hist_from|
+          #   hists_len_p1.each do |hist_to|
+          #     are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 1
+          #     connect_hist_friends(hist_from, hist_to) if are_friends
+          #   end
+          # end
+          hist_from_to(hists_len_cur, hists_len_p1)
         end
-        unless hists_len_p1.empty?
-          hists_len_cur.each do |hist_from|
-            hists_len_p1.each do |hist_to|
-              are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 1
-              connect_hist_friends(hist_from, hist_to) if are_friends
-            end
-          end
-        end
+      end
+    end
+  end
+
+  def hist_from_from(hists_len_cur) # (from_hists, from_hist_i, from_words)
+    hists_len_cur.each_with_index do |hist_from, hist_from_i|
+      # (hists_len_cur - [hist_from]).each do |hist_to|
+      (hist_from_i...hists_len_cur.length).each do |i|
+        hist_to = hists_len_cur[i]
+        are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 2
+        connect_hist_friends(hist_from, hist_to) if are_friends
+      end
+    end
+  end
+
+  def hist_from_to(hists_len_cur, hists_len_p1) # (from_hist, from_words)
+    hists_len_cur.each do |hist_from|
+      hists_len_p1.each do |hist_to|
+        are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 1
+        connect_hist_friends(hist_from, hist_to) if are_friends
       end
     end
   end
