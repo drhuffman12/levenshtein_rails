@@ -1,5 +1,5 @@
 horrid,0
-basement,0
+basement,4
 abbey,1
 recursiveness,0
 elastic,0
@@ -216,9 +216,9 @@ abridgement's,3
 abridgements,3
 abridges,2
 abridging,0
-abridgment,1
-abridgment's,1
-abridgments,1
+abridgment,3
+abridgment's,3
+abridgments,3
 abroad,0
 abrogate,2
 abrogated,2
@@ -630,9 +630,9 @@ acknowledgement's,3
 acknowledgements,3
 acknowledges,2
 acknowledging,0
-acknowledgment,1
-acknowledgment's,1
-acknowledgments,1
+acknowledgment,3
+acknowledgment's,3
+acknowledgments,3
 acme,19
 acme's,19
 acmes,19

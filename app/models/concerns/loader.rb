@@ -4,6 +4,9 @@ class Loader
     @input_file  = input_file
     @max_words   = max_words
     @only_test   = only_test
+
+    @cache_known_friends = {}
+    @cache_known_NOT_friends = {}
   end
 
   def run
@@ -197,13 +200,13 @@ class Loader
   def connect_hist_friends(hist_from, hist_to)
     connected = HistFriend.where(hist_from_id: hist_from.id, hist_to_id: hist_to.id)
     unless connected.length > 0
-      hf = HistFriend.create(hist_from_id: hist_from.id, hist_to_id: hist_to.id)
-      hf.comment = 'from-to'
-      hf.save
+      hf = HistFriend.create(hist_from_id: hist_from.id, hist_to_id: hist_to.id, from_length: hist_from.length, to_length: hist_to.length, comment: 'from-to')
+      # hf.comment = 'from-to'
+      # hf.save
 
-      hf = HistFriend.create(hist_from_id: hist_to.id, hist_to_id: hist_from.id)
-      hf.comment = 'to-from'
-      hf.save
+      hf = HistFriend.create(hist_from_id: hist_to.id, hist_to_id: hist_from.id, from_length: hist_from.length, to_length: hist_to.length, comment: 'to-from')
+      # hf.comment = 'to-from'
+      # hf.save
     end
   end
 
@@ -211,29 +214,75 @@ class Loader
     word_lens = WordLength.includes(:histograms).includes(:words).order('word_lengths.length')
     word_lens.each do |word_length|
       from_hists = word_length.histograms
-      from_hists.each do |from_hist|
+      from_hists.each_with_index do |from_hist, from_hist_i|
         from_words = from_hist.words
-        (from_hists - [from_hist]).each do |to_hist|
-          to_words = to_hist.words
-          check_for_word_friends(from_words, to_words, 'from-from')
-        end
-        hist_to_friends = HistFriend.where(hist_from_id: from_hist.id)
-        hist_to_friends.each do |hist_to_friend|
-          to_hist = hist_to_friend.hist_to
-          to_words = to_hist.words
-          check_for_word_friends(from_words, to_words, 'from-to')
-        end
+        # (from_hists - [from_hist]).each do |to_hist|
+        #   to_words = to_hist.words
+        #   check_for_word_friends(from_words, to_words, 'from-from')
+        # end
+        from_from(from_hists, from_hist_i, from_words)
+
+        # hist_to_friends = HistFriend.where(hist_from_id: from_hist.id)
+        # hist_to_friends.each do |hist_to_friend|
+        #   to_hist = hist_to_friend.hist_to
+        #   to_words = to_hist.words
+        #   check_for_word_friends(from_words, to_words, 'from-to')
+        # end
+        from_to(from_hist, from_words)
+
       end
+    end
+  end
+
+  def from_from(from_hists, from_hist_i, from_words)
+    # Compare words of a histogram with words of other histograms of the same length
+    # (i.e.: look for word friends where there is a 'replace' of a character)
+    # def from_from_triangular(from_hists, from_hist, from_hist_i, from_words)
+    # (from_hist_i+1...from_hists.length).each do |i|
+    (from_hist_i...from_hists.length).each do |i|
+      to_hist = from_hists[i]
+      to_words = to_hist.words
+      check_for_word_friends(from_words, to_words, 'from-from')
+    end
+  end
+
+  def from_to(from_hist, from_words)
+    # Compare words of a histogram with words of 'hist_friends' of that histogram
+    # (i.e.: look for word friends where there is a 'add or remove' of a character)
+    # hist_to_friends = HistFriend.where(hist_from_id: from_hist.id, to_length: [from_hist.length - 1, from_hist.length + 1])
+    # hist_to_friends = HistFriend.where(hist_from_id: from_hist.id, to_length: [from_hist.length - 1, from_hist.length, from_hist.length + 1])
+    hist_to_friends = HistFriend.where(hist_from_id: from_hist.id)
+    hist_to_friends.each do |hist_to_friend|
+      to_hist = hist_to_friend.hist_to
+      to_words = to_hist.words
+      check_for_word_friends(from_words, to_words, 'from-to')
     end
   end
 
   def check_for_word_friends(from_words, to_words, comment)
     to_adds = []
     from_words.each do |from_word|
-      to_words.each do |to_word|
+      suspect_words = (to_words || []) - (@cache_known_friends[from_word.name] || []) - (@cache_known_NOT_friends[from_word.name] || [])
+      suspect_words.each do |to_word|
         to_add = {word_from_id: from_word.id, word_to_id: to_word.id}
+        to_add_rev = {word_from_id: to_word.id, word_to_id: from_word.id}
         # to_adds << to_add if Word.friends?(from_word.name, to_word.name) && !to_adds.include?(to_add)
-        to_adds << to_add if Word.friends_in_mem?(from_word.name, to_word.name) && !to_adds.include?(to_add)
+        # to_adds << to_add if Word.friends_in_mem?(from_word.name, to_word.name) && !to_adds.include?(to_add)
+        if Word.friends_in_mem?(from_word.name, to_word.name) && !(to_adds.include?(to_add) && to_adds.include?(to_add_rev))
+          to_adds << to_add
+          to_adds << to_add_rev
+          @cache_known_friends[from_word.name] ||= []
+          @cache_known_friends[from_word.name] << to_word.name
+          @cache_known_friends[to_word.name] ||= []
+          @cache_known_friends[to_word.name] << from_word.name
+        else
+          @cache_known_NOT_friends = {}
+          @cache_known_NOT_friends[from_word.name] ||= []
+          @cache_known_NOT_friends[from_word.name] << to_word.name
+          @cache_known_NOT_friends[to_word.name] ||= []
+          @cache_known_NOT_friends[to_word.name] << from_word.name
+        end
+
       end
     end
     WordFriend.bulk_insert do |worker|
@@ -243,3 +292,20 @@ class Loader
     end
   end
 end
+=begin
+
+Time (and estimated) for up to ~80 words
+
+(assuming a power curve)
+
+time(hrs)
+
+# words
+
+=end
+
+
+
+
+
+
