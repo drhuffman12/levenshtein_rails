@@ -1,5 +1,5 @@
 horrid,0
-basement,0
+basement,4
 abbey,1
 recursiveness,0
 elastic,0

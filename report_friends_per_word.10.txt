@@ -1,8 +1,8 @@
-{:RawWord=>9, :Word=>9, :Histogram=>9, :HistFriend=>2, :HistFriend_max=>9, :WordFriend=>2, :WordFriend_max_word_from_id=>9, :SocialNode=>2, :SocialNode_max_word_orig_id=>9}
+{:RawWord=>9, :Word=>9, :Histogram=>9, :HistFriend=>2, :HistFriend_max=>9, :WordFriend=>4, :WordFriend_max_word_from_id=>9, :SocialNode=>4, :SocialNode_max_word_orig_id=>9}
 
 #friends : #occurs graph
-       1 :       2 **
+       2 :       2 **
 
 count of distinct #friends: 1
 
-avg #friends/word: 1.0
+avg #friends/word: 2.0
