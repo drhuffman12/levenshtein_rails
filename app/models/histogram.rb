@@ -5,11 +5,7 @@ class Histogram < ApplicationRecord
   has_many :hist_from_friends, class_name: "HistFriend", foreign_key: :hist_from_id
   has_many :hist_to_friends, class_name: "HistFriend", foreign_key: :hist_to_id
 
-  # store :hist, accessors: [ :letters, :homepage ], coder: JSON
-  # store :hist, coder: JSON
   serialize :hist
-  # serialize :hist #, Hash
-  # serialize :hist #, JSON
 
   def hist_from_friends
     HistFriend.where(hist_from: id)
@@ -42,8 +38,6 @@ class Histogram < ApplicationRecord
     hist_a.values.inject(0) { |sum, v| sum + v }
   end
 
-  # Histogram.friends_hist?(hist_a, hist_b)
-  # Histogram.friends_hist_type(hist_a, hist_b)
   def self.friends_hist_type(hist_a, hist_b)
     dist = distance_hist(hist_a, hist_b)
     d = delta_hist(hist_a, hist_b)
@@ -52,12 +46,12 @@ class Histogram < ApplicationRecord
     if (dist == key_cnt)
       case dist
         when 1
-          1 # true
+          1 # aka true
         when 2
           dtk = dt.keys
-          2 if (dt[dtk[0]] == - dt[dtk[1]])
+          2 if (dt[dtk[0]] == - dt[dtk[1]]) # aka true
         else
-          0 # false
+          0 # aka false
       end
     else
       false

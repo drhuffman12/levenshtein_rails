@@ -24,7 +24,6 @@ class Loader
   def report # (max_words)
     File.open("report.#{@max_words}.txt", 'w') do |f|
       content = report_content
-      # puts content
       f.write(content)
     end
   end
@@ -85,58 +84,11 @@ class Loader
     msg = "\n#{self.class.name}##{__method__} -> .. Starting with record counts: #{counts.inspect}.\n"
     puts msg
     Rails.logger.info msg
-
-    # WordLength.destroy_all
-    # RawWord.destroy_all
-    # Word.destroy_all
-    # Histogram.destroy_all
-    # WordFriend.destroy_all
-    # HistFriend.destroy_all
-    # SocialNode.destroy_all
-
-    # ActiveRecord::Base.connection.tables.map{ |table_name|
-    #   next if table_name.match(/\Aschema_migrations\Z/) || table_name.match(/\Aar_internal_metadata\Z/)
-    #   table_name if Object.const_defined?(table_name.classify)
-    # }.compact.each do |table_name|
-    #   begin
-    #     msg = "\n#{self.class.name}##{__method__} -> Processing Table #{table_name} ...\n"
-    #     ActiveRecord::Migration.drop_table(table_name)
-    #     ActiveRecord::Migration.create_table(table_name)
-    #     msg = "\n#{self.class.name}##{__method__} -> .. Table #{table_name} cleaned.\n"
-    #     puts msg
-    #     Rails.logger.info msg
-    #   rescue => e
-    #     msg = "\n#{self.class.name}##{__method__} -> .. Table #{table_name} left alone due to error: #{e.message}.\n"
-    #     puts msg
-    #     Rails.logger.info msg
-    #   end
-    # end
-
-    # ActiveRecord::Base.connection.tables.map(&:classify).map{ |name|
-    #   tbl_defined = Object.const_defined?(name)
-    #   name.constantize if tbl_defined
-    #   # }.compact.each(&:delete_all)
-    # }.compact.each do |table|
-    #   begin
-    #     # table.delete_all
-    #     table.destroy_all
-    #     msg = "\n#{self.class.name}##{__method__} -> Table #{table} cleaned.\n"
-    #     puts msg
-    #     Rails.logger.info msg
-    #   rescue => e
-    #     msg = "\n#{self.class.name}##{__method__} -> Table #{table} left alone due to error: #{e.message}.\n"
-    #     puts msg
-    #     Rails.logger.info msg
-    #   end
-    # end
-
   end
 
   ####
 
   def read_input_file
-    # file = File.read(@input_file)
-    # lines = file.lines
     lines = File.read(@input_file).lines
     len = lines.length
     max = @max_words < len ? @max_words : len
@@ -171,28 +123,45 @@ class Loader
   end
 
   def find_hist_friends
-    lens = WordLength.order(:length).pluck(:length)
+    lens_and_hists = WordLength.order(:length).includes(:histograms)
+    lens = []
+    @hists_per_len = {}
+    lens_and_hists.each do |lh|
+      len = lh.length
+      lens << len
+      hists = lh.histograms.all
+      @hists_per_len[len] = hists
+    end
     hists_len_p1 = Histogram.where(length: lens.first).all
     lens.each do |len_cur|
-      # len_m1 = len_cur - 1
       len_p1 = len_cur + 1
-      hists_len_cur = hists_len_p1
-      hists_len_p1 = Histogram.where(length: len_p1).all
-      unless hists_len_cur.empty?
-        hists_len_cur.each do |hist_from|
-          (hists_len_cur - [hist_from]).each do |hist_to|
-            are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 2
-            connect_hist_friends(hist_from, hist_to) if are_friends
-          end
+      hists_len_cur = @hists_per_len[len_cur]
+      hists_len_p1 = @hists_per_len[len_p1]
+      unless hists_len_cur.blank?
+        hist_from_from(hists_len_cur)
+        unless hists_len_p1.blank?
+          hist_from_to(hists_len_cur, hists_len_p1)
         end
-        unless hists_len_p1.empty?
-          hists_len_cur.each do |hist_from|
-            hists_len_p1.each do |hist_to|
-              are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 1
-              connect_hist_friends(hist_from, hist_to) if are_friends
-            end
-          end
-        end
+      end
+    end
+  end
+
+  def hist_from_from(hists_len_cur) # (from_hists, from_hist_i, from_words)
+    hists_len_cur.each_with_index do |hist_from, hist_from_i|
+      # (hists_len_cur - [hist_from]).each do |hist_to|
+      (hist_from_i...hists_len_cur.length).each do |i|
+        hist_to = hists_len_cur[i]
+        are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 2
+        connect_hist_friends(hist_from, hist_to) if are_friends
+      end
+    end
+  end
+
+  def hist_from_to(hists_len_cur, hists_len_p1) # (from_hist, from_words)
+    hists_len_cur.each do |hist_from|
+      hists_len_p1.each do |hist_to|
+        are_friends = Histogram.friends_hist_type(eval(hist_from.hist), eval(hist_to.hist)) == 1
+        connect_hist_friends(hist_from, hist_to) if are_friends
       end
     end
   end
@@ -201,12 +170,7 @@ class Loader
     connected = HistFriend.where(hist_from_id: hist_from.id, hist_to_id: hist_to.id)
     unless connected.length > 0
       hf = HistFriend.create(hist_from_id: hist_from.id, hist_to_id: hist_to.id, from_length: hist_from.length, to_length: hist_to.length, comment: 'from-to')
-      # hf.comment = 'from-to'
-      # hf.save
-
       hf = HistFriend.create(hist_from_id: hist_to.id, hist_to_id: hist_from.id, from_length: hist_from.length, to_length: hist_to.length, comment: 'to-from')
-      # hf.comment = 'to-from'
-      # hf.save
     end
   end
 
@@ -216,18 +180,7 @@ class Loader
       from_hists = word_length.histograms
       from_hists.each_with_index do |from_hist, from_hist_i|
         from_words = from_hist.words
-        # (from_hists - [from_hist]).each do |to_hist|
-        #   to_words = to_hist.words
-        #   check_for_word_friends(from_words, to_words, 'from-from')
-        # end
         from_from(from_hists, from_hist_i, from_words)
-
-        # hist_to_friends = HistFriend.where(hist_from_id: from_hist.id)
-        # hist_to_friends.each do |hist_to_friend|
-        #   to_hist = hist_to_friend.hist_to
-        #   to_words = to_hist.words
-        #   check_for_word_friends(from_words, to_words, 'from-to')
-        # end
         from_to(from_hist, from_words)
 
       end
@@ -237,8 +190,6 @@ class Loader
   def from_from(from_hists, from_hist_i, from_words)
     # Compare words of a histogram with words of other histograms of the same length
     # (i.e.: look for word friends where there is a 'replace' of a character)
-    # def from_from_triangular(from_hists, from_hist, from_hist_i, from_words)
-    # (from_hist_i+1...from_hists.length).each do |i|
     (from_hist_i...from_hists.length).each do |i|
       to_hist = from_hists[i]
       to_words = to_hist.words
@@ -249,8 +200,6 @@ class Loader
   def from_to(from_hist, from_words)
     # Compare words of a histogram with words of 'hist_friends' of that histogram
     # (i.e.: look for word friends where there is a 'add or remove' of a character)
-    # hist_to_friends = HistFriend.where(hist_from_id: from_hist.id, to_length: [from_hist.length - 1, from_hist.length + 1])
-    # hist_to_friends = HistFriend.where(hist_from_id: from_hist.id, to_length: [from_hist.length - 1, from_hist.length, from_hist.length + 1])
     hist_to_friends = HistFriend.where(hist_from_id: from_hist.id)
     hist_to_friends.each do |hist_to_friend|
       to_hist = hist_to_friend.hist_to
@@ -266,8 +215,6 @@ class Loader
       suspect_words.each do |to_word|
         to_add = {word_from_id: from_word.id, word_to_id: to_word.id}
         to_add_rev = {word_from_id: to_word.id, word_to_id: from_word.id}
-        # to_adds << to_add if Word.friends?(from_word.name, to_word.name) && !to_adds.include?(to_add)
-        # to_adds << to_add if Word.friends_in_mem?(from_word.name, to_word.name) && !to_adds.include?(to_add)
         if Word.friends_in_mem?(from_word.name, to_word.name) && !(to_adds.include?(to_add) && to_adds.include?(to_add_rev))
           to_adds << to_add
           to_adds << to_add_rev
@@ -292,20 +239,3 @@ class Loader
     end
   end
 end
-=begin
-
-Time (and estimated) for up to ~80 words
-
-(assuming a power curve)
-
-time(hrs)
-
-# words
-
-=end
-
-
-
-
-
-

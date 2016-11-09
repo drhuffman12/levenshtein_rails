@@ -1,8 +1,8 @@
-{:RawWord=>82, :Word=>71, :Histogram=>71, :HistFriend=>104, :HistFriend_max=>71, :WordFriend=>196, :WordFriend_max_word_from_id=>71, :SocialNode=>778, :SocialNode_max_word_orig_id=>71}
+{:RawWord=>82, :Word=>71, :Histogram=>71, :HistFriend=>106, :HistFriend_max=>71, :WordFriend=>200, :WordFriend_max_word_from_id=>71, :SocialNode=>782, :SocialNode_max_word_orig_id=>71}
 
 #friends : #occurs graph
        1 :       1 *
-       2 :      29 *****************************
+       2 :      31 *******************************
        3 :       4 ****
        4 :       4 ****
        5 :      10 **********
@@ -13,4 +13,4 @@
 
 count of distinct #friends: 9
 
-avg #friends/word: 3.5636363636363635
+avg #friends/word: 3.508771929824561

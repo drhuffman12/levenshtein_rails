@@ -99,43 +99,6 @@ class SocNetBuilder
           jump_to_set(orig_id, next_from_id, not_yet_jumped_to_to_ids, step + 1)
         end
       end
-
-      # been_to_ids = SocialNode.where(word_orig_id: orig_id, word_to_id: to_ids).select(:word_to_id).pluck(:word_to_id)
-      # been_from_to_ids = SocialNode.where(word_orig_id: orig_id, word_from_id: from_id, word_to_id: to_ids).select(:word_to_id).pluck(:word_to_id)
-      #
-      # not_yet_connected_to_ids = to_ids - been_from_to_ids
-      # not_yet_jumped_to_to_ids = to_ids - been_to_ids
-      #
-      # Rails.logger.debug "#{self.class.name}##{__method__} -> .. to_ids: #{to_ids}"
-      # Rails.logger.debug "#{self.class.name}##{__method__} -> .. .. been_to_ids: #{been_to_ids}"
-      # Rails.logger.debug "#{self.class.name}##{__method__} -> .. .. been_from_to_ids: #{been_from_to_ids}"
-      # Rails.logger.debug "#{self.class.name}##{__method__} -> .. .. not_yet_connected_to_ids: #{not_yet_connected_to_ids}"
-      # Rails.logger.debug "#{self.class.name}##{__method__} -> .. .. not_yet_jumped_to_to_ids: #{not_yet_jumped_to_to_ids}"
-      #
-      # connect_set(orig_id, from_id, not_yet_connected_to_ids, step + 1)
-      # jump_to_set(orig_id, from_id, not_yet_jumped_to_to_ids, step + 1)
     end
   end
-
-
-
-  # def find_word_social_net
-  #   WordFriend.select(:word_from_id, :word_to_id).order(:word_from_id, :word_to_id).all.each do |wf|
-  #     # puts wf
-  #     word_from_id = wf.word_from_id
-  #     word_to_id = wf.word_to_id
-  #     @word_ids_to_friend_ids[word_from_id] ||= []
-  #     @word_ids_to_friend_ids[word_from_id] << word_to_id
-  #   end
-  #   # @word_ids_to_friend_ids
-  #
-  #
-  #   # Word.limit(5).includes(:word_to_friends).all.each do |word|
-  #   #   # @word_ids_and_friend_ids[word.id] = word.word_to_friends.
-  #   #   # puts "#{word.id} : #{word.word_to_friends}"
-  #   #   puts "#{word.id} : #{word.word_to_friends.pluck(:word_from_id)}"
-  #   # end
-  #
-  # end
-
 end
