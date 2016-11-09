@@ -2,86 +2,86 @@ Dropped database 'levenshtein_rails_production'
 Created database 'levenshtein_rails_production'
 == 20160101000001 CreateTables: migrating =====================================
 -- create_table(:word_lengths)
-   -> 0.0062s
+   -> 0.0061s
 -- create_table(:words)
-   -> 0.0056s
+   -> 0.0047s
 -- create_table(:word_friends)
-   -> 0.0062s
+   -> 0.0061s
 -- create_table(:hist_friends)
-   -> 0.0042s
+   -> 0.0063s
 -- create_table(:social_nodes)
-   -> 0.0040s
+   -> 0.0079s
 -- create_table(:histograms)
-   -> 0.0051s
-== 20160101000001 CreateTables: migrated (0.0316s) ============================
+   -> 0.0081s
+== 20160101000001 CreateTables: migrated (0.0401s) ============================
 
 == 20161005034750 CreateWordLengths: migrating ================================
 -- add_column(:word_lengths, :length, :integer)
-   -> 0.0006s
-== 20161005034750 CreateWordLengths: migrated (0.0007s) =======================
+   -> 0.0005s
+== 20161005034750 CreateWordLengths: migrated (0.0006s) =======================
 
 == 20161005034759 CreateWords: migrating ======================================
 -- add_column(:words, :name, :string)
-   -> 0.0044s
+   -> 0.0032s
 -- add_column(:words, :length, :integer)
    -> 0.0005s
 -- add_reference(:words, :word_length, {:foreign_key=>true})
-   -> 0.0069s
+   -> 0.0076s
 -- add_reference(:words, :histogram, {:foreign_key=>true})
-   -> 0.0071s
-== 20161005034759 CreateWords: migrated (0.0193s) =============================
+   -> 0.0094s
+== 20161005034759 CreateWords: migrated (0.0210s) =============================
 
 == 20161005035240 CreateWordFriends: migrating ================================
 -- add_column(:word_friends, :traced_by, :text)
-   -> 0.0061s
+   -> 0.0043s
 -- add_column(:word_friends, :traced_last_by, :string)
-   -> 0.0011s
+   -> 0.0005s
 -- add_reference(:word_friends, :word_from, {:foreign_key=>{:to_table=>:words}})
-   -> 0.0129s
+   -> 0.0061s
 -- add_reference(:word_friends, :word_to, {:foreign_key=>{:to_table=>:words}})
-   -> 0.0107s
-== 20161005035240 CreateWordFriends: migrated (0.0315s) =======================
+   -> 0.0063s
+== 20161005035240 CreateWordFriends: migrated (0.0175s) =======================
 
 == 20161005035315 CreateHistFriends: migrating ================================
 -- add_column(:hist_friends, :traced_by, :text)
-   -> 0.0055s
+   -> 0.0060s
 -- add_column(:hist_friends, :traced_last_by, :string)
-   -> 0.0010s
+   -> 0.0011s
 -- add_reference(:hist_friends, :hist_from, {:foreign_key=>{:to_table=>:histograms}})
-   -> 0.0126s
+   -> 0.0133s
 -- add_reference(:hist_friends, :hist_to, {:foreign_key=>{:to_table=>:histograms}})
-   -> 0.0125s
-== 20161005035315 CreateHistFriends: migrated (0.0324s) =======================
+   -> 0.0115s
+== 20161005035315 CreateHistFriends: migrated (0.0327s) =======================
 
 == 20161006012552 CreateSocialNodes: migrating ================================
 -- add_column(:social_nodes, :qty_steps, :integer)
    -> 0.0013s
 -- add_reference(:social_nodes, :word_orig, {:foreign_key=>{:to_table=>:words}})
-   -> 0.0115s
+   -> 0.0112s
 -- add_reference(:social_nodes, :word_from, {:foreign_key=>{:to_table=>:words}})
-   -> 0.0106s
+   -> 0.0127s
 -- add_reference(:social_nodes, :word_to, {:foreign_key=>{:to_table=>:words}})
-   -> 0.0117s
-== 20161006012552 CreateSocialNodes: migrated (0.0361s) =======================
+   -> 0.0133s
+== 20161006012552 CreateSocialNodes: migrated (0.0500s) =======================
 
 == 20161006013850 CreateHistograms: migrating =================================
 -- add_column(:histograms, :hist, :text)
-   -> 0.0069s
+   -> 0.0058s
 -- add_column(:histograms, :length, :integer)
-   -> 0.0011s
+   -> 0.0010s
 -- add_reference(:histograms, :word_length, {:foreign_key=>true})
-   -> 0.0130s
-== 20161006013850 CreateHistograms: migrated (0.0216s) ========================
+   -> 0.0109s
+== 20161006013850 CreateHistograms: migrated (0.0184s) ========================
 
 == 20161016061938 AddFromLengthToHistFriends: migrating =======================
 -- add_column(:hist_friends, :from_length, :integer)
-   -> 0.0011s
-== 20161016061938 AddFromLengthToHistFriends: migrated (0.0013s) ==============
+   -> 0.0012s
+== 20161016061938 AddFromLengthToHistFriends: migrated (0.0014s) ==============
 
 == 20161016062047 AddToLengthToHistFriends: migrating =========================
 -- add_column(:hist_friends, :to_length, :integer)
-   -> 0.0010s
-== 20161016062047 AddToLengthToHistFriends: migrated (0.0012s) ================
+   -> 0.0012s
+== 20161016062047 AddToLengthToHistFriends: migrated (0.0013s) ================
 
 == 20161016062048 AddFromLengthToWordFriends: migrating =======================
 -- add_column(:word_friends, :from_length, :integer)
@@ -90,111 +90,223 @@ Created database 'levenshtein_rails_production'
 
 == 20161016062049 AddToLengthToWordFriends: migrating =========================
 -- add_column(:word_friends, :to_length, :integer)
-   -> 0.0010s
-== 20161016062049 AddToLengthToWordFriends: migrated (0.0012s) ================
+   -> 0.0012s
+== 20161016062049 AddToLengthToWordFriends: migrated (0.0014s) ================
 
 == 20161016063220 AddCommentToHistFriends: migrating ==========================
 -- add_column(:hist_friends, :comment, :string)
-   -> 0.0010s
-== 20161016063220 AddCommentToHistFriends: migrated (0.0012s) =================
+   -> 0.0012s
+== 20161016063220 AddCommentToHistFriends: migrated (0.0014s) =================
 
 == 20161016063221 AddCommentToWordFriends: migrating ==========================
 -- add_column(:word_friends, :comment, :string)
-   -> 0.0007s
-== 20161016063221 AddCommentToWordFriends: migrated (0.0008s) =================
+   -> 0.0012s
+== 20161016063221 AddCommentToWordFriends: migrated (0.0014s) =================
 
 == 20161016073907 AddTraversedIdsToWords: migrating ===========================
 -- add_column(:words, :traversed_ids, :string)
-   -> 0.0006s
-== 20161016073907 AddTraversedIdsToWords: migrated (0.0007s) ==================
+   -> 0.0014s
+== 20161016073907 AddTraversedIdsToWords: migrated (0.0016s) ==================
 
 == 20161016085708 AddIsTestCaseToWords: migrating =============================
 -- add_column(:words, :is_test_case, :string)
-   -> 0.0007s
-== 20161016085708 AddIsTestCaseToWords: migrated (0.0008s) ====================
+   -> 0.0012s
+== 20161016085708 AddIsTestCaseToWords: migrated (0.0014s) ====================
 
 == 20161016092721 AddSocNetSizeToWords: migrating =============================
 -- add_column(:words, :soc_net_size, :integer)
-   -> 0.0005s
-== 20161016092721 AddSocNetSizeToWords: migrated (0.0006s) ====================
+   -> 0.0015s
+== 20161016092721 AddSocNetSizeToWords: migrated (0.0017s) ====================
 
 == 20161105201128 CreateRawWords: migrating ===================================
 -- create_table(:raw_words)
-   -> 0.0160s
-== 20161105201128 CreateRawWords: migrated (0.0162s) ==========================
+   -> 0.0206s
+== 20161105201128 CreateRawWords: migrated (0.0208s) ==========================
 
        user     system      total        real
-max_words: 2656
+max_words: 10
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 Loader#remove_records -> .. Starting with record counts: {:WordLength=>0, :RawWord=>0, :Word=>0, :Histogram=>0, :WordFriend=>0, :HistFriend=>0, :SocialNode=>0}.
-{:RawWord=>2655, :Word=>2264, :Histogram=>2244, :HistFriend=>4830, :HistFriend_max=>2244, :WordFriend=>3815, :WordFriend_max_word_from_id=>2261, :SocialNode=>123122, :SocialNode_max_word_orig_id=>2261}
+{:RawWord=>9, :Word=>9, :Histogram=>9, :HistFriend=>2, :HistFriend_max=>9, :WordFriend=>4, :WordFriend_max_word_from_id=>9, :SocialNode=>4, :SocialNode_max_word_orig_id=>9}
 
 #friends : #occurs graph
-       1 :     992 ********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
+       2 :       2 **
+
+count of distinct #friends: 1
+
+avg #friends/word: 2.0
+
+--------------------------------------------------------------------------------
+  0.990000   0.040000   1.030000 (  1.252971)
+max_words: 21
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+Loader#remove_records -> .. Starting with record counts: {:WordLength=>0, :RawWord=>0, :Word=>0, :Histogram=>0, :WordFriend=>0, :HistFriend=>0, :SocialNode=>0}.
+{:RawWord=>20, :Word=>18, :Histogram=>18, :HistFriend=>10, :HistFriend_max=>17, :WordFriend=>22, :WordFriend_max_word_from_id=>17, :SocialNode=>30, :SocialNode_max_word_orig_id=>17}
+
+#friends : #occurs graph
+       2 :       6 ******
+       3 :       2 **
+       4 :       1 *
+
+count of distinct #friends: 3
+
+avg #friends/word: 2.4444444444444446
+
+--------------------------------------------------------------------------------
+  1.610000   0.030000   1.640000 (  2.255158)
+max_words: 42
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+Loader#remove_records -> .. Starting with record counts: {:WordLength=>0, :RawWord=>0, :Word=>0, :Histogram=>0, :WordFriend=>0, :HistFriend=>0, :SocialNode=>0}.
+{:RawWord=>41, :Word=>39, :Histogram=>39, :HistFriend=>62, :HistFriend_max=>39, :WordFriend=>128, :WordFriend_max_word_from_id=>39, :SocialNode=>674, :SocialNode_max_word_orig_id=>39}
+
+#friends : #occurs graph
+       1 :       1 *
+       2 :      11 ***********
+       3 :       4 ****
+       4 :       1 *
+       5 :       6 ******
+       6 :       1 *
+       7 :       1 *
+       8 :       2 **
+      10 :       3 ***
+
+count of distinct #friends: 9
+
+avg #friends/word: 4.266666666666667
+
+--------------------------------------------------------------------------------
+  6.570000   0.130000   6.700000 (  7.982241)
+max_words: 83
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+Loader#remove_records -> .. Starting with record counts: {:WordLength=>0, :RawWord=>0, :Word=>0, :Histogram=>0, :WordFriend=>0, :HistFriend=>0, :SocialNode=>0}.
+{:RawWord=>82, :Word=>71, :Histogram=>71, :HistFriend=>106, :HistFriend_max=>71, :WordFriend=>200, :WordFriend_max_word_from_id=>71, :SocialNode=>782, :SocialNode_max_word_orig_id=>71}
+
+#friends : #occurs graph
+       1 :       1 *
+       2 :      31 *******************************
+       3 :       4 ****
+       4 :       4 ****
+       5 :      10 **********
+       6 :       1 *
+       7 :       1 *
+       8 :       2 **
+      10 :       3 ***
+
+count of distinct #friends: 9
+
+avg #friends/word: 3.508771929824561
+
+--------------------------------------------------------------------------------
+ 10.550000   0.170000  10.720000 ( 12.740784)
+max_words: 166
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+Loader#remove_records -> .. Starting with record counts: {:WordLength=>0, :RawWord=>0, :Word=>0, :Histogram=>0, :WordFriend=>0, :HistFriend=>0, :SocialNode=>0}.
+{:RawWord=>165, :Word=>145, :Histogram=>145, :HistFriend=>212, :HistFriend_max=>145, :WordFriend=>372, :WordFriend_max_word_from_id=>145, :SocialNode=>1170, :SocialNode_max_word_orig_id=>145}
+
+#friends : #occurs graph
+       1 :       1 *
+       2 :      61 *************************************************************
+       3 :      11 ***********
+       4 :       6 ******
+       5 :      22 **********************
+       6 :       1 *
+       7 :       2 **
+       8 :       4 ****
+      10 :       3 ***
+
+count of distinct #friends: 9
+
+avg #friends/word: 3.3513513513513513
+
+--------------------------------------------------------------------------------
+ 22.030000   0.440000  22.470000 ( 26.603826)
+max_words: 332
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+Loader#remove_records -> .. Starting with record counts: {:WordLength=>0, :RawWord=>0, :Word=>0, :Histogram=>0, :WordFriend=>0, :HistFriend=>0, :SocialNode=>0}.
+{:RawWord=>331, :Word=>291, :Histogram=>290, :HistFriend=>438, :HistFriend_max=>289, :WordFriend=>682, :WordFriend_max_word_from_id=>290, :SocialNode=>1846, :SocialNode_max_word_orig_id=>290}
+
+#friends : #occurs graph
+       1 :       1 *
+       2 :     127 *******************************************************************************************************************************
+       3 :      19 *******************
+       4 :      17 *****************
+       5 :      38 **************************************
+       6 :       1 *
+       7 :       4 ****
+       8 :       6 ******
+      10 :       3 ***
+
+count of distinct #friends: 9
+
+avg #friends/word: 3.1574074074074074
+
+--------------------------------------------------------------------------------
+ 50.590000   1.080000  51.670000 ( 61.542518)
+max_words: 664
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+Loader#remove_records -> .. Starting with record counts: {:WordLength=>0, :RawWord=>0, :Word=>0, :Histogram=>0, :WordFriend=>0, :HistFriend=>0, :SocialNode=>0}.
+{:RawWord=>663, :Word=>579, :Histogram=>576, :HistFriend=>930, :HistFriend_max=>576, :WordFriend=>1510, :WordFriend_max_word_from_id=>579, :SocialNode=>7476, :SocialNode_max_word_orig_id=>579}
+
+#friends : #occurs graph
+       1 :       1 *
        2 :     252 ************************************************************************************************************************************************************************************************************************************************************
-       3 :     297 *********************************************************************************************************************************************************************************************************************************************************************************************************
-       4 :      69 *********************************************************************
-       5 :      68 ********************************************************************
-       6 :      39 ***************************************
-       7 :      17 *****************
-       8 :      18 ******************
-       9 :      10 **********
-      10 :       8 ********
-      11 :       4 ****
-      12 :       4 ****
-      13 :       3 ***
-      14 :       1 *
+       3 :      41 *****************************************
+       4 :      33 *********************************
+       5 :      70 **********************************************************************
+       6 :       6 ******
+       7 :       6 ******
+       8 :      11 ***********
+       9 :       1 *
+      10 :      11 ***********
+      11 :       2 **
+      13 :       6 ******
+      15 :       1 *
 
-count of distinct #friends: 14
+count of distinct #friends: 13
 
-avg #friends/word: 2.1408529741863074
+avg #friends/word: 3.4240362811791383
 
 --------------------------------------------------------------------------------
-2310.450000  56.370000 2366.820000 (2883.946841)
-max_words: 5312
+140.700000   3.070000 143.770000 (171.885042)
+max_words: 1328
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 Loader#remove_records -> .. Starting with record counts: {:WordLength=>0, :RawWord=>0, :Word=>0, :Histogram=>0, :WordFriend=>0, :HistFriend=>0, :SocialNode=>0}.
-{:RawWord=>5311, :Word=>4476, :Histogram=>4430, :HistFriend=>12886, :HistFriend_max=>4429, :WordFriend=>8781, :WordFriend_max_word_from_id=>4475, :SocialNode=>1441262, :SocialNode_max_word_orig_id=>4475}
+{:RawWord=>1327, :Word=>1150, :Histogram=>1145, :HistFriend=>1946, :HistFriend_max=>1145, :WordFriend=>3200, :WordFriend_max_word_from_id=>1149, :SocialNode=>16758, :SocialNode_max_word_orig_id=>1149}
 
 #friends : #occurs graph
-       1 :    1969 *************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
-       2 :     473 *****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
-       3 :     553 *************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
-       4 :     140 ********************************************************************************************************************************************
-       5 :     126 ******************************************************************************************************************************
-       6 :      84 ************************************************************************************
-       7 :      37 *************************************
+       1 :       3 ***
+       2 :     507 ***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
+       3 :      59 ***********************************************************
+       4 :      74 **************************************************************************
+       5 :     143 ***********************************************************************************************************************************************
+       6 :      12 ************
+       7 :      18 ******************
        8 :      32 ********************************
-       9 :      27 ***************************
-      10 :      24 ************************
-      11 :      13 *************
-      12 :      11 ***********
-      13 :      13 *************
-      14 :       9 *********
-      15 :       6 ******
-      16 :       6 ******
-      17 :       5 *****
-      18 :       7 *******
-      19 :       4 ****
-      20 :       4 ****
-      21 :       5 *****
-      22 :       5 *****
-      23 :       1 *
-      24 :       2 **
-      25 :       1 *
-      26 :       1 *
-      27 :       1 *
-      28 :       1 *
+       9 :       2 **
+      10 :      18 ******************
+      11 :       2 **
+      12 :       1 *
+      13 :      14 **************
+      15 :       4 ****
+      16 :       2 **
+      17 :       1 *
+      18 :       1 *
 
-count of distinct #friends: 28
+count of distinct #friends: 17
 
-avg #friends/word: 2.4665730337078653
+avg #friends/word: 3.5834266517357225
 
 --------------------------------------------------------------------------------
-7843.240000 248.470000 8091.710000 (10526.387693)
-max_words: 10624
+415.440000   9.280000 424.720000 (509.456036)
+max_words: 2656
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 Loader#remove_records -> .. Starting with record counts: {:WordLength=>0, :RawWord=>0, :Word=>0, :Histogram=>0, :WordFriend=>0, :HistFriend=>0, :SocialNode=>0}.
