@@ -58,9 +58,9 @@ abbreviating,0
 abbreviation,1
 abbreviation's,1
 abbreviations,1
-abbé,0
-abbé's,0
-abbés,0
+abbé,1
+abbé's,1
+abbés,1
 abdicate,2
 abdicated,2
 abdicates,2
