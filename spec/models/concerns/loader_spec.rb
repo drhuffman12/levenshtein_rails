@@ -72,31 +72,54 @@ RSpec.describe Loader, type: :model do
         end
       end
 
-      context 'input3.txt' do
-        let(:input_file) { './spec/models/concerns/input3.txt' }
-        let(:expected_report_contents) { ["horrid,0",
-                                          "basement,0",
-                                          "abbey,0",
-                                          "recursiveness,0",
-                                          "elastic,0",
-                                          "macrographies,0",
-                                          "a,0",
-                                          "aardvark,1",
-                                          "aardvark's,1",
-                                          "aardvarks,1",
-                                          "abaci,1",
-                                          "aback,1",
-                                          "abacus,2",
-                                          "abacus's,2",
-                                          "abacuses,2",
-                                          "abaft,0",
-                                          "abalone,1",
-                                          "abalone's,1",
-                                          "abalones,1",
-                                          "abandon,0"].sort.join("\n") }
+      context 'input.21.txt' do
+        let(:max_words_sizes) { [21] }
+        let(:input_file)               { './spec/models/concerns/input.21.txt' }
+        let(:expected_report_file)     { './spec/models/concerns/report.21.txt' }
+        let(:generated_report_file)     { './spec/models/concerns/report.21.out.txt' }
+        let(:expected_report_contents) { File.read(expected_report_file) }
         it 'returns expected content ' do
           subject.run
-          expect(subject.report_content.split("\n").sort.join("\n")).to eq(expected_report_contents)
+          content = subject.report_content
+          File.open(generated_report_file, 'w') do |f|
+            f.write(content)
+          end
+
+          expect(subject.report_content).to eq(expected_report_contents) # .split("\n").sort.join("\n")
+        end
+      end
+
+      context 'input.42.txt' do
+        let(:max_words_sizes) { [42] }
+        let(:input_file)               { './spec/models/concerns/input.42.txt' }
+        let(:expected_report_file)     { './spec/models/concerns/report.42.txt' }
+        let(:generated_report_file)     { './spec/models/concerns/report.42.out.txt' }
+        let(:expected_report_contents) { File.read(expected_report_file) }
+        it 'returns expected content ' do
+          subject.run
+          content = subject.report_content
+          File.open(generated_report_file, 'w') do |f|
+            f.write(content)
+          end
+
+          expect(subject.report_content).to eq(expected_report_contents) # .split("\n").sort.join("\n")
+        end
+      end
+
+      context 'input.83.txt' do
+        let(:max_words_sizes) { [83] }
+        let(:input_file)               { './spec/models/concerns/input.83.txt' }
+        let(:expected_report_file)     { './spec/models/concerns/report.83.txt' }
+        let(:generated_report_file)     { './spec/models/concerns/report.83.out.txt' }
+        let(:expected_report_contents) { File.read(expected_report_file) }
+        it 'returns expected content ' do
+          subject.run
+          content = subject.report_content
+          File.open(generated_report_file, 'w') do |f|
+            f.write(content)
+          end
+
+          expect(subject.report_content).to eq(expected_report_contents) # .split("\n").sort.join("\n")
         end
       end
     end

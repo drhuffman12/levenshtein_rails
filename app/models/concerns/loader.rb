@@ -176,7 +176,8 @@ class Loader
     lens.each do |len_cur|
       # len_m1 = len_cur - 1
       len_p1 = len_cur + 1
-      hists_len_cur = hists_len_p1
+      # hists_len_cur = hists_len_p1
+      hists_len_cur = Histogram.where(length: len_cur).all
       hists_len_p1 = Histogram.where(length: len_p1).all
       unless hists_len_cur.empty?
         hists_len_cur.each do |hist_from|
@@ -251,6 +252,7 @@ class Loader
     # (i.e.: look for word friends where there is a 'add or remove' of a character)
     # hist_to_friends = HistFriend.where(hist_from_id: from_hist.id, to_length: [from_hist.length - 1, from_hist.length + 1])
     # hist_to_friends = HistFriend.where(hist_from_id: from_hist.id, to_length: [from_hist.length - 1, from_hist.length, from_hist.length + 1])
+    # hist_to_friends = HistFriend.where(hist_from_id: from_hist.id, to_length: [from_hist.length + 1])
     hist_to_friends = HistFriend.where(hist_from_id: from_hist.id)
     hist_to_friends.each do |hist_to_friend|
       to_hist = hist_to_friend.hist_to
