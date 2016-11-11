@@ -3,11 +3,25 @@
 * Calculate the 'social network' quantity for a group of words based on their Levenshtein Distance.
 * See [RULES.md](doc/RULES.md).
 
+## Main concept of this approach:
+
+The only words that could possibly be 'friends' are only the pairs of words that:
+ * have length difference of 0 or +/-1
+ * have different histograms (e.g.: "abc" == {'a': 1, 'b': 1, 'c': 1}, "abb" == {'a': 1, 'b': 2}).
+
 ### This approach utilizes:
+ * all words of length difference of 0 or +/-1 and with the different histogram might be 'friends'
  * adjustable # of words to process (currently via editing the value for `max_words` (or `max_words_sizes`) in `db/seeds.rb` or by creating a `Loader` with applicable params.)
  * 'raw' words vs (filtered) 'words' (i.e.: some characters are ignored, such as '-', so "a-b" would be treated as if it is "ab") 
  * word lengths
+   - words of length difference of more than one by definition are NOT 'friends'
  * the histogram of letters of each word
+   - all words with the same histogram are by definition are NOT 'friends'
+     - e.g.: 'abc' and 'cba' have the same histogram, but require more than one change
+   - all words of different histogram and length difference of 0 or +/-1 might be 'friends'
+     - e.g.: 'abc' and 'ab' have the different histograms, and require one change (remove)
+     - e.g.: 'abc' and 'abb' have the different histograms, and require one change (replace)
+     - e.g.: 'abc' and 'abcd' have the different histograms, and require one change (add)
  * histogram 'friends' (i.e.: exactly 1 letter is different, either via 'add a letter', 'remove a letter', or 'change a letter')
  * word 'friends' (i.e.: likewise, filtered by various combinations of that word's histogram and that histogram's 'friends')
  * social network (i.e.: a word's social network is all of the words that it can get to via it's friends' and their 'friends', etc.)
@@ -109,4 +123,3 @@ RAILS_ENV=production bundle exec rails s
 ```sh
 sh ./retest.sh
 ```
-
